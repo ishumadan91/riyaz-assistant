@@ -1,6 +1,6 @@
 # Riyāz — alankar practice
 
-**[Open the app →](https://ishumadan91.github.io/riyaz-assistant/)**
+**[Open the app →](https://www.ishumadan91.in/riyaz-assistant/)**
 
 A metronome-driven alankar drill for Hindustani vocal riyaz, built on the
 **LWCG design system**. Each session deals five alankars at random and two
@@ -11,7 +11,7 @@ runs **2 cycles of 8 beats** per sequence, then moves on by itself.
 
 ## Running it
 
-It runs at **[ishumadan91.github.io/riyaz-assistant](https://ishumadan91.github.io/riyaz-assistant/)**.
+It runs at **[www.ishumadan91.in/riyaz-assistant](https://www.ishumadan91.in/riyaz-assistant/)**.
 
 To run it locally, open `index.html` — double-click it, no build step and no
 server. Plain scripts, no modules, so `file://` is fine.
