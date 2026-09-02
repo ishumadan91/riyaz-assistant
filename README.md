@@ -24,13 +24,13 @@ server. Plain scripts, no modules, so `file://` is fine.
 | `←` `→` | previous / next sequence (restarts the cycle at sam) |
 | `n` | new session |
 | `r` | reveal the upcoming sequences |
-| `esc` | close settings |
+| `esc` | close settings or about |
 
 Upcoming sequences in the sidebar show `—` to keep the surprise; press `r` or
 tick **Settings → reveal** to see them. Click any row to jump to it.
 
-**Settings** opens from the header and drops down beneath it; close it with the
-Close button, the header button again, or `esc`.
+**Settings** and **About** open from the header and drop down beneath it; close
+either with its Close button, the header button again, or `esc`.
 
 ## The cycle
 

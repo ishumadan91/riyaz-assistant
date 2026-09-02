@@ -74,6 +74,11 @@ body { margin: 0; }
 .riyaz-settings { padding: 0.75rem 1.5rem 0; }
 .riyaz-settings__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
+/* The About panel is long; keep it scrollable rather than pushing the practice
+   card off screen. markdown-body owns the prose itself. */
+.riyaz-about { max-height: 52vh; overflow-y: auto; }
+.riyaz-about > h3:first-child { margin-top: 0; }
+
 /* -------------------------------------------------------------- transport */
 .riyaz-transport {
   background: var(--color-surface);

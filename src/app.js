@@ -221,11 +221,37 @@ function stop() {
 }
 function togglePlay() { metro.running ? stop() : play(); }
 
-function setSettings(open) {
-  $('drawer').hidden = !open;
-  $('moreBtn').setAttribute('aria-expanded', String(open));
-  if (open) $('closeSettings').focus();
-  else $('moreBtn').focus();
+/* One panel at a time: opening either closes the other. */
+var PANELS = {
+  settings: { panel: 'drawer', trigger: 'moreBtn',  close: 'closeSettings' },
+  about:    { panel: 'about',  trigger: 'aboutBtn', close: 'closeAbout' }
+};
+
+function setPanel(name, open) {
+  Object.keys(PANELS).forEach(function (k) {
+    var p = PANELS[k];
+    var isOpen = open && k === name;
+    $(p.panel).hidden = !isOpen;
+    $(p.trigger).setAttribute('aria-expanded', String(isOpen));
+  });
+  var p = PANELS[name];
+  if (open) $(p.close).focus(); else $(p.trigger).focus();
+}
+
+function closePanels() {
+  Object.keys(PANELS).forEach(function (k) {
+    if (!$(PANELS[k].panel).hidden) setPanel(k, false);
+  });
+}
+
+function anyPanelOpen() {
+  return Object.keys(PANELS).some(function (k) { return !$(PANELS[k].panel).hidden; });
+}
+
+function renderAbout() {
+  $('aboutBody').innerHTML = ABOUT_SECTIONS.map(function (s) {
+    return '<h3>' + s.title + '</h3>' + s.html;
+  }).join('');
 }
 
 /* ------------------------------------------------------------------ wiring */
@@ -276,8 +302,12 @@ function initControls() {
     save();
   });
 
-  $('moreBtn').addEventListener('click', function () { setSettings($('drawer').hidden); });
-  $('closeSettings').addEventListener('click', function () { setSettings(false); });
+  renderAbout();
+  Object.keys(PANELS).forEach(function (k) {
+    var p = PANELS[k];
+    $(p.trigger).addEventListener('click', function () { setPanel(k, $(p.panel).hidden); });
+    $(p.close).addEventListener('click', function () { setPanel(k, false); });
+  });
 
   $('playBtn').addEventListener('click', togglePlay);
   $('nextBtn').addEventListener('click', function () { goto(state.index + 1); });
@@ -292,10 +322,10 @@ function initControls() {
 
   document.addEventListener('keydown', function (e) {
     if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) {
-      if (e.key === 'Escape' && !$('drawer').hidden) setSettings(false);
+      if (e.key === 'Escape' && anyPanelOpen()) closePanels();
       return;
     }
-    if (e.key === 'Escape') { if (!$('drawer').hidden) setSettings(false); return; }
+    if (e.key === 'Escape') { if (anyPanelOpen()) closePanels(); return; }
     if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
     else if (e.key === 'ArrowRight') goto(state.index + 1);
     else if (e.key === 'ArrowLeft') goto(state.index - 1);
