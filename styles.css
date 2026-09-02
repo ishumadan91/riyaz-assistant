@@ -1,0 +1,190 @@
+/* Riyāz — the thin layer on top of the LWCG design system.
+   Only what the system has no vocabulary for: the app shell, the beat row,
+   and swara notation. Every colour here is an LWCG token — no new colours,
+   and nothing that restyles a component the system already owns. */
+
+/* ------------------------------------------------------------------ shell */
+html, body { height: 100%; }
+body { margin: 0; }
+
+.riyaz-shell {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.riyaz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+/* h1 is sized for a page title; in a header bar it wants the h4 step */
+.riyaz-title {
+  margin: 0;
+  font-size: var(--font-size-h4);
+  line-height: 1.2;
+  color: var(--color-heading);
+}
+
+/* two-column-layout is built for in-page use; here it fills the viewport */
+.riyaz-main {
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+.riyaz-rail {
+  width: 14rem;
+  padding: 1rem;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+.riyaz-stage {
+  overflow-y: auto;
+  border-left: 0;
+}
+.riyaz-stage > * { max-width: 60rem; }
+
+/* tree-nav__item is an anchor in the system; these are buttons. Set only what
+   the button needs — NOT colour or background, or the system's own
+   .tree-nav__item.is-active state would never show (see the cascade note in
+   the README: this file is unlayered and outranks every @layer rule). */
+.riyaz-slot {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.riyaz-slot__n {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  min-width: 1.25rem;
+}
+.riyaz-slot.is-done { color: var(--color-text-muted); }
+
+/* --------------------------------------------------------------- settings */
+.riyaz-settings { padding: 0.75rem 1.5rem 0; }
+.riyaz-settings__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* -------------------------------------------------------------- transport */
+.riyaz-transport {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 0.75rem 1.5rem;
+}
+.riyaz-transport__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  flex-wrap: wrap;
+}
+.riyaz-bpm { width: 5rem; text-align: center; }
+
+/* The step indicator, reused as a beat row. The cycle divides in half, so
+   steps__line becomes a short vibhag rule and the two marked beats — sam and
+   the half-way beat — sit a size up from the plain matras. */
+.riyaz-beats { margin: 0; gap: 0.5rem; }
+.riyaz-beats .steps__line {
+  width: 1px;
+  height: 0.875rem;
+  background: var(--color-border);
+}
+.riyaz-beats .steps__step.is-sam .steps__dot,
+.riyaz-beats .steps__step.is-mid .steps__dot { width: 0.875rem; height: 0.875rem; }
+.riyaz-beats .steps__step.is-sam.is-done .steps__dot { background: var(--color-accent); }
+.riyaz-beats .steps__step.is-sam.is-current .steps__dot {
+  background: var(--color-accent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-accent) 25%, transparent);
+}
+
+/* the thaat pool is a 3-up grid; the system's choice-group stacks vertically */
+.riyaz-thaats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.riyaz-thaats .choice-item { min-height: 0; padding: 0.5rem 0.75rem; }
+
+/* -------------------------------------------------------------- notation */
+.riyaz-part + .riyaz-part { margin-top: 1rem; }
+.riyaz-lines { overflow-x: auto; }
+.riyaz-line {
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  line-height: 2.2;
+  color: var(--color-heading);
+  white-space: pre-wrap;
+}
+.riyaz-lines.is-dense .riyaz-line { font-size: clamp(0.875rem, 1.2vw, 1rem); line-height: 1.9; }
+.riyaz-part.is-centred .riyaz-line { text-align: center; }
+.riyaz-part.is-centred .riyaz-lines { max-width: 30ch; }
+
+/* Bhatkhande marks. Tracking comes from margin, not letter-spacing, so each
+   swara's box is exactly its glyph and the rules hug the letter. */
+.sw {
+  display: inline-block;
+  position: relative;
+  line-height: 1;
+  padding-bottom: 0.07em;
+  margin-right: 0.1em;
+}
+.sw.komal  { border-bottom: 1.5px solid var(--color-primary); color: var(--color-primary); }
+.sw.teevra { border-top: 1.5px solid var(--color-primary); color: var(--color-primary); padding-top: 0.07em; }
+.sw.taar::after,
+.sw.mandra::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.15em;
+  height: 0.15em;
+  min-width: 2px;
+  min-height: 2px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.sw.taar::after   { top: -0.3em; }
+.sw.mandra::before { bottom: -0.34em; }
+.pn { color: var(--color-text-muted); margin-right: 0.1em; }
+.riyaz-grp { white-space: nowrap; }
+
+.riyaz-scale { font-family: var(--font-mono); }
+.riyaz-scale .sw, .riyaz-scale .pn { margin-right: 0.18em; }
+.note-line .field-label { display: inline; margin-right: 0.5rem; }
+
+/* ------------------------------------------------------------ responsive */
+@media (max-width: 768px) {
+  .riyaz-header { padding: 0.625rem 1rem; }
+  .riyaz-main { flex-direction: column; }
+  .riyaz-rail {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .riyaz-rail .field-label { display: none; }
+  .riyaz-rail .tree-nav { flex-direction: row; gap: 0.375rem; }
+  .riyaz-rail .tree-nav__item { flex: 0 0 auto; white-space: nowrap; }
+  .riyaz-rail .riyaz-slot { width: auto; }
+  .riyaz-stage { padding: 1rem; }
+  .riyaz-settings { padding: 0.5rem 1rem 0; }
+  .riyaz-settings__grid { grid-template-columns: minmax(0, 1fr); }
+  .riyaz-thaats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .riyaz-transport { padding: 0.5rem 1rem; }
+  .riyaz-transport__row { justify-content: center; gap: 0.5rem 1rem; }
+  .riyaz-transport__controls { gap: 0.5rem 0.75rem; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
