@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Riyāz">
+  <rect width="32" height="32" rx="7" fill="#008080"/>
+  <circle cx="9" cy="16" r="4.6" fill="#FF6F61"/>
+  <rect x="15.4" y="9.5" width="1.2" height="13" rx="0.6" fill="#F4F1DE" opacity="0.55"/>
+  <circle cx="23" cy="16" r="4.6" fill="#F4F1DE"/>
+</svg>
