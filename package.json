@@ -1,0 +1,28 @@
+{
+  "name": "riyaz-assistant",
+  "version": "1.0.0",
+  "description": "Alankar practice app — Lit web components, atomic design",
+  "type": "module",
+  "license": "ISC",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "build:lib": "tsc --noEmit && vite build --mode lib",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "about": "node scripts/build-about.js",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^8.4.7",
+    "@storybook/web-components": "^8.4.7",
+    "@storybook/web-components-vite": "^8.4.7",
+    "storybook": "^8.4.7",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}

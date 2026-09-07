@@ -3,10 +3,12 @@
    from the README rather than a copy of it that drifts.
    Run: node scripts/build-about.js   (CI checks the result is committed) */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = path.join(__dirname, '..');
+// package.json sets "type": "module", so this file is ESM — no __dirname.
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = 'https://github.com/ishumadan91/riyaz-assistant/blob/main/';
 
 /* Which README sections become About panel sections, in order.
@@ -15,6 +17,7 @@ const SECTIONS = [
   { heading: null,          title: 'Riyāz' },
   { heading: 'Using it',    title: 'Using it' },
   { heading: 'The cycle',   title: 'The cycle' },
+  { heading: 'Modes',       title: 'Modes' },
   { heading: 'Thaats',      title: 'Thaats' },
   { heading: 'Notation',    title: 'Notation' },
   { heading: 'Licence',     title: 'Licence' }
@@ -70,11 +73,16 @@ function sectionBody(md, heading) {
 const md = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
 const out = SECTIONS.map(s => ({ title: s.title, html: toHtml(sectionBody(md, s.heading)) }));
 
-fs.writeFileSync(path.join(ROOT, 'src', 'about.js'),
+fs.writeFileSync(path.join(ROOT, 'src', 'data', 'about.ts'),
   '/* GENERATED FILE — do not edit.\n' +
   '   Derived from README.md by scripts/build-about.js; re-run that after\n' +
-  '   editing the README sections it draws from. */\n\n' +
-  'var ABOUT_SECTIONS = ' + JSON.stringify(out, null, 2) + ';\n');
+  '   editing the README sections it draws from. CI checks it is in sync. */\n\n' +
+  'export interface AboutSection {\n' +
+  '  title: string;\n' +
+  '  /** Build-time HTML from this repo\'s own README — see rz-about-sheet. */\n' +
+  '  html: string;\n' +
+  '}\n\n' +
+  'export const ABOUT_SECTIONS: AboutSection[] = ' + JSON.stringify(out, null, 2) + ';\n');
 
-console.log('src/about.js written —', out.length, 'sections:',
+console.log('src/data/about.ts written —', out.length, 'sections:',
             out.map(s => s.title).join(', '));

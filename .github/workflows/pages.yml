@@ -1,5 +1,5 @@
-# The app is plain static files with no build step, so Pages serves the repo
-# root as-is.
+# The app is now a Vite build, so Pages publishes dist/ rather than the repo
+# root. `base` in vite.config.ts must match the project-pages subpath.
 name: Deploy to GitHub Pages
 
 on:
@@ -24,9 +24,15 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: dist
       - id: deployment
         uses: actions/deploy-pages@v4

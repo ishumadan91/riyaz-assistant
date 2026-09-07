@@ -6,9 +6,10 @@
 .idea/
 *.swp
 
-# tooling that may creep in later
-node_modules/
-package-lock.json
 
 # local agent scratch
 .claude/
+node_modules/
+dist/
+dist-lib/
+storybook-static/

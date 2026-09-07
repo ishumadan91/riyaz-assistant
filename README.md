@@ -13,8 +13,17 @@ runs **2 cycles of 8 beats** per sequence, then moves on by itself.
 
 It runs at **[www.ishumadan91.in/riyaz-assistant](https://www.ishumadan91.in/riyaz-assistant/)**.
 
-To run it locally, open `index.html` — double-click it, no build step and no
-server. Plain scripts, no modules, so `file://` is fine.
+Locally:
+
+```
+npm install
+npm run dev          # the app
+npm run storybook    # the component workbench
+```
+
+It is a Lit + TypeScript component library built with Vite. `npm run build:lib`
+produces a single self-contained `dist-lib/riyaz.js` that another site can host
+as `<rz-practice-page>`.
 
 ## Using it
 
@@ -24,6 +33,8 @@ server. Plain scripts, no modules, so `file://` is fine.
 | `←` `→` | previous / next sequence (restarts the cycle at sam) |
 | `n` | new session |
 | `r` | reveal the upcoming sequences |
+| `l` | repeat this alankar / move on |
+| `u` | unlimited mode |
 | `esc` | close settings or about |
 
 Upcoming sequences in the sidebar show `—` to keep the surprise; press `r` or
@@ -33,6 +44,10 @@ tick **Settings → reveal** to see them. Click any row to jump to it.
 either with its Close button, the header button again, or `esc`.
 
 ## The cycle
+
+A new sequence is counted in first — **3 · 2 · 1** on a thin high tick, so there
+is a breather to read the alankar before singing it. The cycle proper starts on
+the beat after. Repeat mode has no count-in: see below.
 
 Eight beats are heard as **4 + 4**, so two beats are marked and they sound
 different from each other, not just louder:
@@ -46,6 +61,21 @@ different from each other, not just louder:
 The cycle is fixed at eight beats and is not a setting; the divider is simply
 the half-way beat. A thin rule sits between the halves in the beat row.
 
+## Modes
+
+The transport carries two toggles, to the right of play.
+
+**Repeat** ⟳ — by default the metronome moves on to the next sequence after its
+cycles. Switch it to repeat-one and it stays on the current alankar and **loops
+continuously**, with no 3 · 2 · 1 between passes: you already know the one you
+are drilling, so a count-in every time round would interrupt the point of it.
+
+**Unlimited** ∞ — instead of the day's ten, keep drawing: every Next deals a
+fresh pairing from *all* 53 alankars and *all* ten thaats, ignoring both the
+day's session and the thaat pool. It never ends and never reports a finished
+session. Turning it off returns you to the day's session exactly where you left
+it — the stream never overwrites it.
+
 ## Thaats
 
 Bilawal is compulsory and always the first sequence. **Settings → thaats in the
@@ -53,8 +83,14 @@ pool** ticks the other nine on and off; the randomiser only ever draws the
 paired thaat from the ticked ones. The last ticked thaat cannot be unticked —
 the pairing needs somewhere to go.
 
-Tempo, the thaat pool, cycles per alankar and reveal all persist in
+Tempo, the thaat pool, cycles per alankar, reveal and both modes persist in
 `localStorage` under the key `riyaz`.
+
+**The day's session is kept until midnight.** Refreshing resumes the same ten
+sequences at the same position rather than re-rolling them, so a reload mid-riyaz
+costs nothing. Tomorrow deals new material, and **New session** overrides it
+whenever you want a different set today. It is stored under `riyaz:session`
+against a local calendar date, so "midnight" means yours.
 
 ## Design system
 
