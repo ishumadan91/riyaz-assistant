@@ -98,10 +98,14 @@ be dealt.
 
 ## The cycle
 
-Each sequence is preceded by a **3-beat count-in** (`COUNT_IN_BEATS`) on its own
-stroke, so a sequence is `COUNT_IN_BEATS + 8 × cyclesPerItem` beats long and all
+A new sequence is preceded by a **3-beat count-in** on its own stroke, so all
 the beat maths runs off `beatsPerSequence`, not the cycle length. The count
 stroke is high and thin so it can never be mistaken for sam.
+
+**Repeat-one has no count-in** — `countInBeats` returns 0 — so it loops
+continuously. That makes `beatsPerSequence` change when repeat is toggled, which
+shifts the `n % total` phase: `toggleRepeat()` therefore resyncs while playing,
+or the beat would land at an arbitrary point of the new cycle.
 
 `Metronome.strokeFor` is the hook that makes this possible: the page decides
 each beat's stroke. It is called at **schedule** time, up to LOOKAHEAD ahead of
@@ -134,9 +138,9 @@ With no Web Audio at all it stays silent rather than throwing.
 
 `repeat` and `unlimited` are preferences, and both change what `advance()` does.
 
-- **repeat-one** stays on the current sequence. It still reports
-  `rz-sequence-complete` — the metronome did get through it, so it was practice —
-  and the beat maths restarts the count-in on its own.
+- **repeat-one** stays on the current sequence and loops with no count-in. It
+  still reports `rz-sequence-complete` — the metronome did get through it, so it
+  was practice.
 - **unlimited** is a mode, not a filter. Entering it starts a fresh endless
   stream (`startUnlimited`), and `advance`/`goto` append a `randomItem()` drawn
   from **all** alankars and **all** thaats — deliberately ignoring both the day's

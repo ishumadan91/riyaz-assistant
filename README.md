@@ -45,9 +45,9 @@ either with its Close button, the header button again, or `esc`.
 
 ## The cycle
 
-Every sequence is counted in first — **3 · 2 · 1** on a thin high tick, so
-there is a breather to read the new alankar before singing it. The cycle proper
-starts on the beat after.
+A new sequence is counted in first — **3 · 2 · 1** on a thin high tick, so there
+is a breather to read the alankar before singing it. The cycle proper starts on
+the beat after. Repeat mode has no count-in: see below.
 
 Eight beats are heard as **4 + 4**, so two beats are marked and they sound
 different from each other, not just louder:
@@ -66,8 +66,9 @@ the half-way beat. A thin rule sits between the halves in the beat row.
 The transport carries two toggles, to the right of play.
 
 **Repeat** ⟳ — by default the metronome moves on to the next sequence after its
-cycles. Switch it to repeat-one and it stays on the current alankar, counting in
-again each time round, until you move on yourself.
+cycles. Switch it to repeat-one and it stays on the current alankar and **loops
+continuously**, with no 3 · 2 · 1 between passes: you already know the one you
+are drilling, so a count-in every time round would interrupt the point of it.
 
 **Unlimited** ∞ — instead of the day's ten, keep drawing: every Next deals a
 fresh pairing from *all* 53 alankars and *all* ten thaats, ignoring both the

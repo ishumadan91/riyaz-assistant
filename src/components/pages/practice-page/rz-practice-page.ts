@@ -297,9 +297,18 @@ export class RzPracticePage extends LitElement {
 
   /* --------------------------------------------------------------- beats */
 
+  /**
+   * Beats the count-in takes. Repeat-one has none: you are drilling the same
+   * alankar over and over, so a 3 · 2 · 1 between every pass would interrupt
+   * the very thing repeat is for. It loops continuously instead.
+   */
+  private get countInBeats(): number {
+    return this.repeat === 'one' ? 0 : COUNT_IN_BEATS;
+  }
+
   /** Count-in plus the cycles: one sequence's worth of beats. */
   private get beatsPerSequence(): number {
-    return COUNT_IN_BEATS + BEATS_PER_CYCLE * this.cyclesPerItem;
+    return this.countInBeats + BEATS_PER_CYCLE * this.cyclesPerItem;
   }
 
   /**
@@ -307,9 +316,10 @@ export class RzPracticePage extends LitElement {
    * beat number alone — never from state that only becomes true on arrival.
    */
   private strokeFor(n: number): 'sam' | 'mid' | 'beat' | 'count' {
+    const lead = this.countInBeats;
     const into = n % this.beatsPerSequence;
-    if (into < COUNT_IN_BEATS) return 'count';
-    const pos = (into - COUNT_IN_BEATS) % BEATS_PER_CYCLE;
+    if (into < lead) return 'count';
+    const pos = (into - lead) % BEATS_PER_CYCLE;
     if (pos === 0) return 'sam';
     return pos === midBeatIndex(BEATS_PER_CYCLE) ? 'mid' : 'beat';
   }
@@ -318,15 +328,16 @@ export class RzPracticePage extends LitElement {
     const total = this.beatsPerSequence;
     if (n > 0 && n % total === 0 && !this.advance()) return;
 
+    const lead = this.countInBeats;
     const into = n % total;
-    if (into < COUNT_IN_BEATS) {
-      this.countIn = COUNT_IN_BEATS - into; // 3, 2, 1
+    if (into < lead) {
+      this.countIn = lead - into; // 3, 2, 1
       this.beat = 0;
       this.cycle = 0;
       return;
     }
     this.countIn = 0;
-    const p = into - COUNT_IN_BEATS;
+    const p = into - lead;
     this.beat = p % BEATS_PER_CYCLE;
     this.cycle = Math.floor(p / BEATS_PER_CYCLE);
   }
@@ -411,6 +422,14 @@ export class RzPracticePage extends LitElement {
   private toggleRepeat() {
     this.repeat = this.repeat === 'one' ? 'all' : 'one';
     this.persist();
+    this.countIn = 0;
+    // beatsPerSequence changes with the count-in, so the running phase would
+    // otherwise land at an arbitrary point of the new cycle. Restart from sam.
+    if (this.metro.running) {
+      this.beat = 0;
+      this.cycle = 0;
+      this.metro.resync();
+    }
   }
 
   /**
