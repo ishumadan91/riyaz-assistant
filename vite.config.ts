@@ -2,15 +2,21 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(({ mode }) => {
   if (mode === 'lib') {
-    // Embed build: one self-contained ESM file a host page can load with a
-    // plain <script type="module">. Lit is deliberately NOT externalised —
+    // Embed build: one self-contained file a host page loads with a plain
+    // classic <script src>.
+    //
+    // IIFE rather than ESM, and that is load-bearing: a `<script type=module>`
+    // fetch is always CORS-mode, so serving this from a CDN on another origin
+    // needs an Access-Control-Allow-Origin header the bucket does not send. A
+    // classic script has no such requirement. Lit is deliberately NOT externalised —
     // the host (a Django app with no bundler) cannot resolve a bare import.
     // Tokens are not bundled either: the host's own :root supplies them.
     return {
       build: {
         lib: {
           entry: 'src/embed.ts',
-          formats: ['es' as const],
+          formats: ['iife' as const],
+          name: 'Riyaz',
           fileName: () => 'riyaz.js',
         },
         outDir: 'dist-lib',
