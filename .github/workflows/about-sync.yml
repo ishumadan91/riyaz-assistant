@@ -1,5 +1,5 @@
-# src/about.js is generated from README.md. If someone edits a README section
-# the About panel draws from and forgets to regenerate, this fails loudly.
+# src/data/about.ts is generated from README.md. If someone edits a README
+# section the About panel draws from and forgets to regenerate, this fails.
 name: About panel matches README
 
 on:
@@ -16,10 +16,10 @@ jobs:
         with:
           node-version: '20'
       - run: node scripts/build-about.js
-      - name: src/about.js is up to date
+      - name: src/data/about.ts is up to date
         run: |
-          if ! git diff --quiet -- src/about.js; then
-            echo "::error::src/about.js is stale. Run: node scripts/build-about.js"
-            git diff -- src/about.js
+          if ! git diff --quiet -- src/data/about.ts; then
+            echo "::error::src/data/about.ts is stale. Run: npm run about"
+            git diff -- src/data/about.ts
             exit 1
           fi

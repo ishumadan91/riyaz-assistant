@@ -1,0 +1,33 @@
+/* Global resets + document-level layout. Standalone build only — the embed
+   build never loads this, because a component that sizes itself to the
+   viewport cannot sit inside a host page's layout. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The viewport frame lives here, not in the template: `rz-practice-template`
+   fills its host with `height: 100%`, and only the standalone page claims the
+   whole viewport. */
+rz-practice-page {
+  display: block;
+  height: 100dvh;
+}

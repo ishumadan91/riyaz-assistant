@@ -13,8 +13,17 @@ runs **2 cycles of 8 beats** per sequence, then moves on by itself.
 
 It runs at **[www.ishumadan91.in/riyaz-assistant](https://www.ishumadan91.in/riyaz-assistant/)**.
 
-To run it locally, open `index.html` — double-click it, no build step and no
-server. Plain scripts, no modules, so `file://` is fine.
+Locally:
+
+```
+npm install
+npm run dev          # the app
+npm run storybook    # the component workbench
+```
+
+It is a Lit + TypeScript component library built with Vite. `npm run build:lib`
+produces a single self-contained `dist-lib/riyaz.js` that another site can host
+as `<rz-practice-page>`.
 
 ## Using it
 
