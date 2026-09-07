@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import type { Saptak } from '../../../data/notation.js';
 
 /**
@@ -25,7 +26,9 @@ import type { Saptak } from '../../../data/notation.js';
  */
 @customElement('rz-swara')
 export class RzSwara extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: inline-block;
       position: relative;
@@ -61,7 +64,8 @@ export class RzSwara extends LitElement {
     .mandra {
       bottom: -0.34em;
     }
-  `;
+  `,
+  ];
 
   @property({ type: String }) letter = '';
   @property({ type: Boolean, reflect: true }) komal = false;

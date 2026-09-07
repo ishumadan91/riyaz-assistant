@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/badge/rz-badge.js';
 import '../../atoms/button/rz-button.js';
 import type { Thaat } from '../../../data/thaats.js';
@@ -14,7 +15,9 @@ import type { Thaat } from '../../../data/thaats.js';
  */
 @customElement('rz-app-header')
 export class RzAppHeader extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: flex;
       align-items: center;
@@ -56,8 +59,27 @@ export class RzAppHeader extends LitElement {
       .sub {
         display: none;
       }
+      h1 {
+        font-size: var(--font-size-xl);
+      }
     }
-  `;
+    /* On a phone the header has to earn its height: the session's thaat pair is
+       already on the alankar card's badge and against every row of the rail, so
+       the chips go and title + actions fit on one line. */
+    @media (max-width: 560px) {
+      :host {
+        gap: var(--space-2);
+      }
+      .chips {
+        display: none;
+      }
+      .actions {
+        gap: var(--space-1);
+        flex-wrap: nowrap;
+      }
+    }
+  `,
+  ];
 
   @property({ attribute: false }) thaats: Thaat[] = [];
   @property({ type: Boolean }) settingsOpen = false;

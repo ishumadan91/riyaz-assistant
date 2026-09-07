@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/field-label/rz-field-label.js';
 import '../notation-line/rz-notation-line.js';
 import type { NotationGroup } from '../../../data/notation.js';
@@ -14,7 +15,9 @@ import type { NotationGroup } from '../../../data/notation.js';
  */
 @customElement('rz-alankar-part')
 export class RzAlankarPart extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
     }
@@ -32,7 +35,8 @@ export class RzAlankarPart extends LitElement {
     :host([centred]) rz-notation-line {
       text-align: center;
     }
-  `;
+  `,
+  ];
 
   @property({ type: String }) label = '';
   @property({ attribute: false }) lines: NotationGroup[][] = [];

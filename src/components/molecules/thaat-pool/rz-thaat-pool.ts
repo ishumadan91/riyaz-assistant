@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/checkbox/rz-checkbox.js';
 import { OPTIONAL_THAATS } from '../../../data/thaats.js';
 
@@ -18,7 +19,9 @@ import { OPTIONAL_THAATS } from '../../../data/thaats.js';
  */
 @customElement('rz-thaat-pool')
 export class RzThaatPool extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
     }
@@ -38,7 +41,8 @@ export class RzThaatPool extends LitElement {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
-  `;
+  `,
+  ];
 
   @property({ attribute: false }) enabled: string[] = [];
 

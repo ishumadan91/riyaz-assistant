@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 
 export type BadgeTone = 'primary' | 'secondary';
 
@@ -11,7 +12,9 @@ export type BadgeTone = 'primary' | 'secondary';
  */
 @customElement('rz-badge')
 export class RzBadge extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: inline-block;
       font-family: var(--font-family-base);
@@ -31,7 +34,8 @@ export class RzBadge extends LitElement {
       color: var(--color-text);
       border-color: var(--color-border);
     }
-  `;
+  `,
+  ];
 
   @property({ type: String, reflect: true }) tone: BadgeTone = 'secondary';
   @property({ type: String }) label = '';

@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/button/rz-button.js';
 import '../../atoms/field-label/rz-field-label.js';
 import '../../atoms/number-field/rz-number-field.js';
@@ -16,7 +17,9 @@ import { BPM_MAX, BPM_MIN } from '../../../data/preferences.js';
  */
 @customElement('rz-tempo-control')
 export class RzTempoControl extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: flex;
       align-items: center;
@@ -25,7 +28,20 @@ export class RzTempoControl extends LitElement {
     rz-number-field {
       width: 5rem;
     }
-  `;
+    /* The steppers say what this is; the label is the first thing to go. */
+    @media (max-width: 560px) {
+      :host {
+        gap: var(--space-1);
+      }
+      rz-field-label {
+        display: none;
+      }
+      rz-number-field {
+        width: 3.75rem;
+      }
+    }
+  `,
+  ];
 
   @property({ type: Number }) value = 72;
   @property({ type: Number }) step = 2;

@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../icon/rz-icon.js';
 import type { IconName } from '../icon/icon-registry.js';
 
@@ -18,7 +19,9 @@ export type IconButtonVariant = 'plain' | 'filled';
  */
 @customElement('rz-icon-button')
 export class RzIconButton extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: inline-block;
     }
@@ -69,7 +72,8 @@ export class RzIconButton extends LitElement {
       color: var(--color-primary);
       background: var(--color-teal-100);
     }
-  `;
+  `,
+  ];
 
   @property({ type: String }) icon: IconName = 'play';
   @property({ type: String, reflect: true }) variant: IconButtonVariant = 'plain';

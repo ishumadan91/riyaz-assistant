@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import { ICONS, type IconName } from './icon-registry.js';
 
 /**
@@ -8,7 +9,9 @@ import { ICONS, type IconName } from './icon-registry.js';
  */
 @customElement('rz-icon')
 export class RzIcon extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: inline-flex;
       width: 1em;
@@ -20,7 +23,8 @@ export class RzIcon extends LitElement {
       height: 100%;
       display: block;
     }
-  `;
+  `,
+  ];
 
   @property({ type: String }) name: IconName = 'play';
 

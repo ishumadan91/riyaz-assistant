@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/button/rz-button.js';
 
 /**
@@ -9,7 +10,9 @@ import '../../atoms/button/rz-button.js';
  */
 @customElement('rz-session-complete')
 export class RzSessionComplete extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: flex;
       flex-direction: column;
@@ -29,7 +32,8 @@ export class RzSessionComplete extends LitElement {
       margin: 0 0 var(--space-4);
       font-size: var(--font-size-lg);
     }
-  `;
+  `,
+  ];
 
   @property({ type: Number }) sequences = 10;
 

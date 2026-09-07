@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 
 /**
  * rz-field-label — the small uppercase label above a group of content:
@@ -7,7 +8,9 @@ import { customElement } from 'lit/decorators.js';
  */
 @customElement('rz-field-label')
 export class RzFieldLabel extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
       font-family: var(--font-family-base);
@@ -17,7 +20,8 @@ export class RzFieldLabel extends LitElement {
       text-transform: uppercase;
       color: var(--color-text-muted);
     }
-  `;
+  `,
+  ];
 
   render() {
     return html`<slot></slot>`;

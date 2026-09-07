@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 
 /**
  * rz-rail-item — one row of the sequence rail.
@@ -18,7 +19,9 @@ import { customElement, property } from 'lit/decorators.js';
  */
 @customElement('rz-rail-item')
 export class RzRailItem extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
     }
@@ -62,7 +65,8 @@ export class RzRailItem extends LitElement {
     :host([done]) button {
       color: var(--color-text-muted);
     }
-  `;
+  `,
+  ];
 
   @property({ type: Number }) index = 1;
   @property({ type: String }) label = '';

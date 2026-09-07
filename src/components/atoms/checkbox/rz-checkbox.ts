@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 
 /**
  * rz-checkbox — a bordered, tickable row. Used for the reveal toggle and for
@@ -10,7 +11,9 @@ import { customElement, property } from 'lit/decorators.js';
  */
 @customElement('rz-checkbox')
 export class RzCheckbox extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
     }
@@ -50,7 +53,8 @@ export class RzCheckbox extends LitElement {
       outline: 2px solid var(--color-primary);
       outline-offset: 2px;
     }
-  `;
+  `,
+  ];
 
   @property({ type: Boolean, reflect: true }) checked = false;
   @property({ type: String }) label = '';

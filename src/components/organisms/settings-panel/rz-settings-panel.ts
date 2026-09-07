@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/button/rz-button.js';
 import '../../atoms/card/rz-card.js';
 import '../../atoms/checkbox/rz-checkbox.js';
@@ -19,7 +20,9 @@ import { CYCLES_MAX, CYCLES_MIN } from '../../../data/preferences.js';
  */
 @customElement('rz-settings-panel')
 export class RzSettingsPanel extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
       padding: var(--space-3) var(--space-6) 0;
@@ -65,7 +68,8 @@ export class RzSettingsPanel extends LitElement {
         grid-template-columns: minmax(0, 1fr);
       }
     }
-  `;
+  `,
+  ];
 
   @property({ type: Number }) cyclesPerItem = 2;
   @property({ type: Boolean }) reveal = false;

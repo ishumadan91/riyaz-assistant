@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../templates/practice-template/rz-practice-template.js';
 import type { Panel } from '../../templates/practice-template/rz-practice-template.js';
 import { Metronome, midBeatIndex } from '../../../audio/metronome.js';
@@ -41,7 +42,9 @@ const COUNT_IN_BEATS = 3;
  */
 @customElement('rz-practice-page')
 export class RzPracticePage extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
       height: 100%;
@@ -51,7 +54,8 @@ export class RzPracticePage extends LitElement {
     :host(:focus) {
       outline: none;
     }
-  `;
+  `,
+  ];
 
   /**
    * Where preferences live.

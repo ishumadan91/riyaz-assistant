@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 
 /**
  * rz-card — a white panel with an optional title row.
@@ -9,7 +10,9 @@ import { customElement, property } from 'lit/decorators.js';
  */
 @customElement('rz-card')
 export class RzCard extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
       background: var(--color-surface);
@@ -17,6 +20,11 @@ export class RzCard extends LitElement {
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-card);
       padding: var(--space-6);
+    }
+    @media (max-width: 560px) {
+      :host {
+        padding: var(--space-4);
+      }
     }
     .title-row {
       display: flex;
@@ -38,7 +46,8 @@ export class RzCard extends LitElement {
       font-weight: var(--font-weight-semibold);
       color: var(--color-heading);
     }
-  `;
+  `,
+  ];
 
   /** Set when nothing is slotted into `title`/`badges`, to drop the row. */
   @property({ type: Boolean, reflect: true, attribute: 'no-header' }) noHeader = false;

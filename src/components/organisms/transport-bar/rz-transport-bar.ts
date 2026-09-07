@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/badge/rz-badge.js';
 import '../../atoms/icon-button/rz-icon-button.js';
 import '../../molecules/beat-row/rz-beat-row.js';
@@ -25,7 +26,9 @@ export type RepeatMode = 'all' | 'one';
  */
 @customElement('rz-transport-bar')
 export class RzTransportBar extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: flex;
       align-items: center;
@@ -62,7 +65,34 @@ export class RzTransportBar extends LitElement {
         padding: var(--space-2) var(--space-4);
       }
     }
-  `;
+    /* Phone: the controls take one row and the readout takes the next, rather
+       than tempo dropping onto a third line of its own. */
+    .cycle-short {
+      display: none;
+    }
+    @media (max-width: 560px) {
+      :host {
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-3);
+      }
+      /* "Cycle 1 of 2" is what stopped the readout and tempo sharing a row. */
+      .cycle-long {
+        display: none;
+      }
+      .cycle-short {
+        display: inline;
+      }
+      .status {
+        min-height: 0;
+        gap: var(--space-2);
+      }
+      .modes {
+        padding-left: var(--space-1);
+        margin-left: 0;
+      }
+    }
+  `,
+  ];
 
   @property({ type: Boolean }) playing = false;
   @property({ type: Number }) beats = 8;
@@ -130,10 +160,10 @@ export class RzTransportBar extends LitElement {
               ></rz-beat-row>
               ${this.repeat === 'one'
                 ? html`<rz-badge tone="secondary" label="Repeating"></rz-badge>`
-                : html`<rz-badge
-                    tone="secondary"
-                    label=${`Cycle ${this.cycle + 1} of ${this.cyclesPerItem}`}
-                  ></rz-badge>`}
+                : html`<rz-badge tone="secondary">
+                    <span class="cycle-long">Cycle ${this.cycle + 1} of ${this.cyclesPerItem}</span>
+                    <span class="cycle-short">${this.cycle + 1}/${this.cyclesPerItem}</span>
+                  </rz-badge>`}
             `}
         ${nothing}
       </div>

@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/field-label/rz-field-label.js';
 import '../../molecules/rail-item/rz-rail-item.js';
 import type { SessionItem } from '../../../data/session.js';
@@ -17,7 +18,9 @@ import type { SessionItem } from '../../../data/session.js';
  */
 @customElement('rz-sequence-rail')
 export class RzSequenceRail extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
       width: var(--rail-width);
@@ -56,7 +59,8 @@ export class RzSequenceRail extends LitElement {
         white-space: nowrap;
       }
     }
-  `;
+  `,
+  ];
 
   @property({ attribute: false }) items: SessionItem[] = [];
   @property({ type: Number }) index = 0;

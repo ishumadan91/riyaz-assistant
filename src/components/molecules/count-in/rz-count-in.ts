@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 
 /**
  * rz-count-in — the 3 · 2 · 1 breather shown while a new sequence is counted in.
@@ -11,7 +12,9 @@ import { customElement, property } from 'lit/decorators.js';
  */
 @customElement('rz-count-in')
 export class RzCountIn extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: flex;
       align-items: center;
@@ -51,7 +54,8 @@ export class RzCountIn extends LitElement {
         animation: none;
       }
     }
-  `;
+  `,
+  ];
 
   @property({ type: Number }) value = 0;
 

@@ -49,6 +49,11 @@ src/
 - `HTMLElementTagNameMap` declaration at the bottom of every component.
 - `useDefineForClassFields` must stay `false` — with it true, class field
   initialisers clobber Lit's accessors and every `@property` stops reacting.
+- **Start every component's styles with `base`** (`src/styles/base.ts`):
+  `static styles = [base, css…]`. `global.css` sets `box-sizing: border-box`
+  with a `*` rule, and that does not cross a shadow boundary — without the reset
+  a component's internals are `content-box`, so any `width: 100%` element with
+  padding overflows its parent by exactly the padding.
 
 ### The prefix is load-bearing
 
@@ -188,6 +193,23 @@ pool must never validate to empty.
 - **Events report, the host computes.** `rz-session-start`,
   `rz-sequence-complete`, `rz-session-complete`. A sequence only counts as
   complete when the *metronome* advanced past it — a manual skip is not practice.
+
+## Responsive
+
+Three breakpoints, and each exists for a reason:
+
+- **768px** — the rail turns from a sidebar into a horizontal strip.
+- **560px** — the phone layout. The header drops the thaat chips so the title
+  and the three actions fit on one line (the pair is still on the card's badge
+  and against every rail row); the tempo control drops its label; the cycle
+  readout shortens from "Cycle 1 of 2" to "1/2", which is what lets the beat row
+  and tempo share a line instead of the transport taking three.
+- The `.cycle-long` / `.cycle-short` pair is chosen in CSS rather than JS
+  precisely so the component needs no viewport listener.
+
+Chrome on a 390×844 phone is 40px of header, 53px of rail and 105px of
+transport, leaving ~646px for the notation. If a change pushes the header or
+transport onto another row, that budget is what it is eating.
 
 ## Panels
 

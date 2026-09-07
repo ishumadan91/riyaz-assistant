@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/badge/rz-badge.js';
 import '../../atoms/card/rz-card.js';
 import '../../atoms/field-label/rz-field-label.js';
@@ -23,7 +24,9 @@ const DENSE_LINE_COUNT = 6;
  */
 @customElement('rz-alankar-card')
 export class RzAlankarCard extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
     }
@@ -61,7 +64,8 @@ export class RzAlankarCard extends LitElement {
       flex-direction: column;
       gap: var(--space-4);
     }
-  `;
+  `,
+  ];
 
   @property({ attribute: false }) alankar!: Alankar;
   @property({ attribute: false }) thaat!: Thaat;

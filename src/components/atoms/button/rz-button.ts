@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'link';
 export type ButtonSize = 'sm' | 'md';
@@ -20,7 +21,9 @@ export type ButtonSize = 'sm' | 'md';
  */
 @customElement('rz-button')
 export class RzButton extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: inline-block;
     }
@@ -92,7 +95,8 @@ export class RzButton extends LitElement {
     :host([variant='link']) button:hover:not([disabled]) {
       color: var(--color-primary);
     }
-  `;
+  `,
+  ];
 
   @property({ type: String, reflect: true }) variant: ButtonVariant = 'primary';
   @property({ type: String, reflect: true }) size: ButtonSize = 'md';

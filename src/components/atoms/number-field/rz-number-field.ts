@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 
 /**
  * rz-number-field — a bounded numeric input.
@@ -12,7 +13,9 @@ import { customElement, property } from 'lit/decorators.js';
  */
 @customElement('rz-number-field')
 export class RzNumberField extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: inline-block;
     }
@@ -33,7 +36,8 @@ export class RzNumberField extends LitElement {
       outline-offset: 1px;
       border-color: var(--color-primary);
     }
-  `;
+  `,
+  ];
 
   @property({ type: Number }) value = 0;
   @property({ type: Number }) min = 0;

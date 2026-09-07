@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../atoms/swara/rz-swara.js';
 import type { NotationGroup } from '../../../data/notation.js';
 
@@ -14,7 +15,9 @@ import type { NotationGroup } from '../../../data/notation.js';
  */
 @customElement('rz-notation-line')
 export class RzNotationLine extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
       font-family: var(--font-mono);
@@ -29,24 +32,24 @@ export class RzNotationLine extends LitElement {
     .group {
       white-space: nowrap;
     }
-    /* The word space between groups — the only place a line may break. */
-    .group + .group::before {
-      content: ' ';
-      white-space: pre;
-    }
     .punct {
       color: var(--color-text-muted);
       margin-right: var(--swara-gap);
     }
-  `;
+  `,
+  ];
 
   @property({ attribute: false }) groups: NotationGroup[] = [];
   @property({ type: Boolean, reflect: true }) dense = false;
 
   render() {
+    // The separating space is a real text node *between* the groups, not
+    // generated inside one: a space within a `nowrap` box is not a break
+    // opportunity, so putting it there stopped lines wrapping at all and long
+    // alankars simply overflowed their card.
     return html`${this.groups.map(
-      (group) =>
-        html`<span class="group"
+      (group, i) =>
+        html`${i ? ' ' : ''}<span class="group"
           >${group.tokens.map((t) =>
             t.kind === 'swara'
               ? html`<rz-swara

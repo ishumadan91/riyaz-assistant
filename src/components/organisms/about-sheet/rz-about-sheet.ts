@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import '../../atoms/button/rz-button.js';
 import '../../atoms/card/rz-card.js';
@@ -12,7 +13,9 @@ import { ABOUT_SECTIONS } from '../../../data/about.js';
  */
 @customElement('rz-about-sheet')
 export class RzAboutSheet extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: block;
       padding: var(--space-3) var(--space-6) 0;
@@ -72,7 +75,8 @@ export class RzAboutSheet extends LitElement {
         padding: var(--space-2) var(--space-4) 0;
       }
     }
-  `;
+  `,
+  ];
 
   render() {
     return html`

@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 import '../../organisms/about-sheet/rz-about-sheet.js';
 import '../../organisms/alankar-card/rz-alankar-card.js';
 import '../../organisms/app-header/rz-app-header.js';
@@ -26,7 +27,9 @@ export type Panel = 'settings' | 'about' | null;
  */
 @customElement('rz-practice-template')
 export class RzPracticeTemplate extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: flex;
       flex-direction: column;
@@ -57,7 +60,13 @@ export class RzPracticeTemplate extends LitElement {
         padding: var(--space-4);
       }
     }
-  `;
+    @media (max-width: 560px) {
+      .stage {
+        padding: var(--space-3);
+      }
+    }
+  `,
+  ];
 
   @property({ attribute: false }) items: SessionItem[] = [];
   @property({ attribute: false }) thaats: Thaat[] = [];

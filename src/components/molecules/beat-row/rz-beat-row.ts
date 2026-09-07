@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { base } from '../../../styles/base.js';
 
 /**
  * rz-beat-row — the cycle as a row of dots.
@@ -15,7 +16,9 @@ import { customElement, property } from 'lit/decorators.js';
  */
 @customElement('rz-beat-row')
 export class RzBeatRow extends LitElement {
-  static styles = css`
+  static styles = [
+    base,
+    css`
     :host {
       display: flex;
       align-items: center;
@@ -53,7 +56,13 @@ export class RzBeatRow extends LitElement {
       height: 13px;
       background: var(--color-border);
     }
-  `;
+    @media (max-width: 560px) {
+      :host {
+        gap: var(--space-1);
+      }
+    }
+  `,
+  ];
 
   @property({ type: Number }) beats = 8;
   @property({ type: Number }) current = 0;
