@@ -51,12 +51,18 @@ export const localStorageAdapter: RiyazStorage = {
   },
 };
 
+/** How the sequence advances when the metronome finishes its cycles. */
+export type RepeatMode = 'all' | 'one';
+
 export interface Preferences {
   bpm: number;
   cyclesPerItem: number;
   reveal: boolean;
   /** Keys of the optional thaats in the pool. Never empty. */
   enabled: string[];
+  repeat: RepeatMode;
+  /** Draw endless random pairings instead of the day's ten. */
+  unlimited: boolean;
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
@@ -64,6 +70,8 @@ export const DEFAULT_PREFERENCES: Preferences = {
   cyclesPerItem: 2,
   reveal: false,
   enabled: OPTIONAL_THAATS.map((t) => t.key),
+  repeat: 'all',
+  unlimited: false,
 };
 
 function clampInt(v: unknown, min: number, max: number, fallback: number): number {
@@ -105,6 +113,9 @@ export function loadPreferences(storage: RiyazStorage): Preferences {
     ),
     reveal: typeof stored.reveal === 'boolean' ? stored.reveal : DEFAULT_PREFERENCES.reveal,
     enabled: enabled.length ? enabled : [...DEFAULT_PREFERENCES.enabled],
+    repeat: stored.repeat === 'one' ? 'one' : DEFAULT_PREFERENCES.repeat,
+    unlimited:
+      typeof stored.unlimited === 'boolean' ? stored.unlimited : DEFAULT_PREFERENCES.unlimited,
   };
 }
 

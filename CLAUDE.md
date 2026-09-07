@@ -93,6 +93,16 @@ be dealt.
 
 ## The cycle
 
+Each sequence is preceded by a **3-beat count-in** (`COUNT_IN_BEATS`) on its own
+stroke, so a sequence is `COUNT_IN_BEATS + 8 × cyclesPerItem` beats long and all
+the beat maths runs off `beatsPerSequence`, not the cycle length. The count
+stroke is high and thin so it can never be mistaken for sam.
+
+`Metronome.strokeFor` is the hook that makes this possible: the page decides
+each beat's stroke. It is called at **schedule** time, up to LOOKAHEAD ahead of
+the beat being heard, so it must be derivable from the beat number alone —
+never from state that only becomes true when the beat arrives.
+
 Eight beats, fixed — not a setting. Heard as 4 + 4, so two beats are marked and
 they differ in timbre as well as loudness: sam is a bright triangle and takes
 `--color-accent`; the half-way beat is a low sine and takes `--color-primary`.
@@ -114,6 +124,33 @@ The context is created lazily (browsers block audio until a gesture) and
 `resume()`'s rejection is swallowed — Safari rejects it when it judges the call
 non-gesture-initiated, and an unhandled rejection there can abort scheduling.
 With no Web Audio at all it stays silent rather than throwing.
+
+## Modes
+
+`repeat` and `unlimited` are preferences, and both change what `advance()` does.
+
+- **repeat-one** stays on the current sequence. It still reports
+  `rz-sequence-complete` — the metronome did get through it, so it was practice —
+  and the beat maths restarts the count-in on its own.
+- **unlimited** is a mode, not a filter. Entering it starts a fresh endless
+  stream (`startUnlimited`), and `advance`/`goto` append a `randomItem()` drawn
+  from **all** alankars and **all** thaats — deliberately ignoring both the day's
+  deal and the thaat pool, because it is the "surprise me" mode. It never
+  finishes and never reports `rz-session-complete`. Leaving it restores the day's
+  session, which was never overwritten: `persistSession()` is a no-op while
+  unlimited.
+
+## The day's session
+
+`data/day-session.ts` keeps the dealt session under `riyaz:session` until **local**
+midnight — `todayKey()` is deliberately not UTC, because midnight means the
+student's midnight. A refresh resumes the same ten at the same position; the next
+day deals new material; "New session" overrides it on demand.
+
+Only the deal is stored (alankar number + thaat key + index), never the alankar
+bodies, so a stored session survives edits to `alankars.ts`. Anything that no
+longer resolves invalidates the whole stored session rather than being patched
+around.
 
 ## Preferences
 

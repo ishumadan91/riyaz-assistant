@@ -7,6 +7,7 @@ import '../../organisms/sequence-rail/rz-sequence-rail.js';
 import '../../organisms/session-complete/rz-session-complete.js';
 import '../../organisms/settings-panel/rz-settings-panel.js';
 import '../../organisms/transport-bar/rz-transport-bar.js';
+import type { RepeatMode } from '../../organisms/transport-bar/rz-transport-bar.js';
 import type { SessionItem } from '../../../data/session.js';
 import type { Thaat } from '../../../data/thaats.js';
 
@@ -72,6 +73,9 @@ export class RzPracticeTemplate extends LitElement {
   @property({ type: Number }) cycle = 0;
   @property({ type: Number }) cyclesPerItem = 2;
   @property({ type: Number }) bpm = 72;
+  @property({ type: Number }) countIn = 0;
+  @property({ type: String }) repeat: RepeatMode = 'all';
+  @property({ type: Boolean }) unlimited = false;
   @property({ attribute: false }) enabled: string[] = [];
 
   render() {
@@ -96,7 +100,8 @@ export class RzPracticeTemplate extends LitElement {
         <rz-sequence-rail
           .items=${this.items}
           index=${this.index}
-          ?reveal=${this.reveal}
+          ?reveal=${this.reveal || this.unlimited}
+          heading=${this.unlimited ? 'Practised' : 'Sequence'}
         ></rz-sequence-rail>
 
         <div class="stage">
@@ -108,6 +113,7 @@ export class RzPracticeTemplate extends LitElement {
                   .thaat=${current.thaat}
                   position=${this.index + 1}
                   total=${this.items.length}
+                  ?unlimited=${this.unlimited}
                 ></rz-alankar-card>`
               : nothing}
         </div>
@@ -121,6 +127,9 @@ export class RzPracticeTemplate extends LitElement {
         cycle=${this.cycle}
         cyclesPerItem=${this.cyclesPerItem}
         bpm=${this.bpm}
+        countIn=${this.countIn}
+        repeat=${this.repeat}
+        ?unlimited=${this.unlimited}
       ></rz-transport-bar>
     `;
   }

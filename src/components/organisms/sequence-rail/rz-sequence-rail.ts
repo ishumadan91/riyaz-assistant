@@ -61,10 +61,13 @@ export class RzSequenceRail extends LitElement {
   @property({ attribute: false }) items: SessionItem[] = [];
   @property({ type: Number }) index = 0;
   @property({ type: Boolean }) reveal = false;
+  /** "Sequence" for a dealt session; "Practised" for the unlimited stream,
+      where nothing is upcoming because nothing has been drawn yet. */
+  @property({ type: String }) heading = 'Sequence';
 
   render() {
     return html`
-      <rz-field-label>Sequence</rz-field-label>
+      <rz-field-label>${this.heading}</rz-field-label>
       <nav class="list" aria-label="Session sequence">
         ${this.items.map((it, i) => {
           const masked = !this.reveal && i > this.index;

@@ -6,7 +6,7 @@
  */
 
 import { ALANKARS, type Alankar } from './alankars.js';
-import { DEFAULT_THAAT, OPTIONAL_THAATS, type Thaat } from './thaats.js';
+import { DEFAULT_THAAT, OPTIONAL_THAATS, THAATS, type Thaat } from './thaats.js';
 
 export interface SessionItem {
   alankar: Alankar;
@@ -52,6 +52,17 @@ export function enabledThaats(enabled: readonly string[]): readonly Thaat[] {
  * position 0: the student starts on the thaat they know before being asked for
  * one they don't. Everything after that stays a surprise.
  */
+/**
+ * One random pairing from everything the app has — all 53 alankars and all ten
+ * thaats, Bilawal included.
+ *
+ * Unlimited mode deliberately ignores both the day's deal and the thaat pool:
+ * it is the "surprise me" mode, so it draws from the whole book.
+ */
+export function randomItem(): SessionItem {
+  return { alankar: pick(ALANKARS), thaat: pick(THAATS) };
+}
+
 export function newSession(enabled: readonly string[]): Session {
   const alankars = shuffle([...ALANKARS]).slice(0, ALANKARS_PER_SESSION);
   const other = pick(enabledThaats(enabled));

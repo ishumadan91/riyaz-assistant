@@ -67,6 +67,8 @@ export class RzAlankarCard extends LitElement {
   @property({ attribute: false }) thaat!: Thaat;
   @property({ type: Number }) position = 1;
   @property({ type: Number }) total = 10;
+  /** An unlimited stream has no end, so no "of N" is shown. */
+  @property({ type: Boolean }) unlimited = false;
 
   render() {
     if (!this.alankar || !this.thaat) return nothing;
@@ -76,7 +78,11 @@ export class RzAlankarCard extends LitElement {
     const dense = lineCount > DENSE_LINE_COUNT;
 
     return html`
-      <p class="position">Sequence ${this.position} of ${this.total}</p>
+      <p class="position">
+        ${this.unlimited
+          ? `Unlimited · sequence ${this.position}`
+          : `Sequence ${this.position} of ${this.total}`}
+      </p>
       <rz-card>
         <h2 slot="title">Alankar ${a.n}</h2>
         <rz-badge
