@@ -108,7 +108,7 @@ export const ALANKARS: readonly Alankar[] = [
   av(35, 6, 'GRS, mGR, PmG, DPm, NDP, S.ND, R.S.N, G.R.S.', 'S.R.G., NS.R., DNS., PDN, mPD, GmP, RGm, SRG, .N S R, .D .N S'),
   av(36, 6, 'mGRS, PmGR, DPmG, NDPm, S.NDP, R.S.ND, G.R.S.N, m.G.R.S.', 'S.R.G.m., NS.R.G., DNS.R., PDNS., mPDN, GmPD, RGmP, SRGm, .N S R G, .D .N S R, .P .D .N S'),
   av(37, 6, 'SRG mGR, RGm PmG, GmP DPm, mPD NDP, PDN S.ND, DNS. R.S.N, NS.R. G.R.S.', 'NS.R. G.R.S., DNS. R.S.N, PDN S.ND, mPD NDP, GmP DPm, RGm PmG, SRG mGR, .N S R, GRS'),
-  av(38, 6, 'SRGm-mGRS, RGmP-PmGR, GmPD-DPmG, mPDN-NDPm, PDNS.-S.NDP, DNS.R.-R.S.ND, NS.R.G.-G.R.S.N, S.R.G.m.-m.G.R.S.', 'S.NDP-PDNS., NDPm-mPDN, DPmG-GmPD, PmGR-RGmP, mGRS-SRGm, GRS .N-.N SRG, RS .N .D-.D .N SR, S .N .D .P-.P .D .N S'),
+  av(38, 6, 'SRGm-mGRS, RGmP-PmGR, GmPD-DPmG, mPDN-NDPm, PDNS.-S.NDP, DNS.R.-R.S.ND, NS.R.G.-G.R.S.N, S.R.G.m.-m.G.R.S.', 'S.NDP-PDNS., NDPm-mPDN, DPmG-GmPD, PmGR-RGmP, mGRS-SRGm, GRS.N-.NSRG, RS.N.D-.D.NSR, S.N.D.P-.P.D.NS'),
   {
     n: 39, group: ALANKAR_GROUPS[6],
     parts: [{ label: '', lines: ['mGRS PmGR DPmG NDPm S.NDP R.S.ND S.NDPmGRS'] }]
@@ -140,7 +140,7 @@ export const ALANKARS: readonly Alankar[] = [
   },
 
   av(43, 7, 'SRGm S, RGmP R, GmPD G, mPDN m, PDNS. P, DNS.R. D, NS.R.G. N, S.R.G.m. S.', 'S.NDP S., NDPm N, DPmG D, PmGR P, mGRS m, GRS .N G, RS .N .D R, S .N .D .P S'),
-  av(44, 7, 'SGRG SRSS, RmGm RGRR, GPmP GmGG, mDPD mPmm, PNDN PDPP, DS.NS. DNDD, NR.S.R. NS.NN, S.G.R.G. S.R.S.S.', 'S.DND S.NS.S., NPDP NDNN, DmPm DPDD, PGmG PmPP, mRGR mGmm, GSRS GRGG, R .N S .N RSRR, S .D .N .D S .N SS'),
+  av(44, 7, 'SGRG SRSS, RmGm RGRR, GPmP GmGG, mDPD mPmm, PNDN PDPP, DS.NS. DNDD, NR.S.R. NS.NN, S.G.R.G. S.R.S.S.', 'S.DND S.NS.S., NPDP NDNN, DmPm DPDD, PGmG PmPP, mRGR mGmm, GSRS GRGG, R.NS.N RSRR, S.D.N.D S.NSS'),
   av(45, 7, '(SRGm) × 2, SRGmPDNS.', '(S.NDP) × 2, S.NDPmGRS'),
   av(46, 7, '(SRGm mGRS) × 2, SRGmPDNS.', '(S.NDP PDNS.) × 2, S.NDPmGRS'),
   av(47, 7, 'SRGm, SR, SR, SRGmPDNS.', 'S.NDP, S.N, S.N, S.NDPmGRS'),
