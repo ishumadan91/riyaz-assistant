@@ -9,7 +9,6 @@ import {
   localStorageAdapter,
   savePreferences,
   type Preferences,
-  type RepeatMode,
   type RiyazStorage,
 } from '../../../data/preferences.js';
 import { loadDaySession, saveDaySession } from '../../../data/day-session.js';
@@ -18,14 +17,6 @@ import type { Thaat } from '../../../data/thaats.js';
 
 /** The cycle is fixed at eight beats, heard as 4 + 4. Not a setting. */
 const BEATS_PER_CYCLE = 8;
-
-/**
- * Beats of breathing space before a sequence starts, cued 3 · 2 · 1.
- *
- * Sequences used to begin on the very next beat after the previous one ended,
- * which left no room to read the new alankar before singing it.
- */
-const COUNT_IN_BEATS = 3;
 
 /**
  * rz-practice-page — owns all state and drives the metronome.
@@ -86,16 +77,11 @@ export class RzPracticePage extends LitElement {
   @state() private panel: Panel = null;
   @state() private playing = false;
   @state() private beat = 0;
-  @state() private cycle = 0;
 
   @state() private bpm = 72;
-  @state() private cyclesPerItem = 2;
   @state() private reveal = false;
   @state() private enabled: string[] = [];
-  @state() private repeat: RepeatMode = 'all';
   @state() private unlimited = false;
-  /** Beats left in the count-in; 0 once the cycle is running. */
-  @state() private countIn = 0;
 
   private metro = new Metronome();
   private sessionStartedAt = 0;
@@ -118,7 +104,6 @@ export class RzPracticePage extends LitElement {
   firstUpdated() {
     this.applyPreferences(loadPreferences(this.storage));
     this.metro.bpm = this.bpm;
-    this.metro.strokeFor = (n) => this.strokeFor(n);
 
     // A refresh should resume today's session, not re-roll it.
     const restored = this.unlimited ? null : loadDaySession(this.storage);
@@ -157,20 +142,16 @@ export class RzPracticePage extends LitElement {
 
   private applyPreferences(p: Preferences) {
     this.bpm = p.bpm;
-    this.cyclesPerItem = p.cyclesPerItem;
     this.reveal = p.reveal;
     this.enabled = p.enabled;
-    this.repeat = p.repeat;
     this.unlimited = p.unlimited;
   }
 
   private persist() {
     savePreferences(this.storage, {
       bpm: this.bpm,
-      cyclesPerItem: this.cyclesPerItem,
       reveal: this.reveal,
       enabled: this.enabled,
-      repeat: this.repeat,
       unlimited: this.unlimited,
     });
   }
@@ -195,8 +176,6 @@ export class RzPracticePage extends LitElement {
     this.index = 0;
     this.finished = false;
     this.beat = 0;
-    this.cycle = 0;
-    this.countIn = 0;
     this.sessionStartedAt = Date.now();
     this.persistSession();
     if (this.metro.running) this.metro.resync();
@@ -215,8 +194,6 @@ export class RzPracticePage extends LitElement {
     this.index = 0;
     this.finished = false;
     this.beat = 0;
-    this.cycle = 0;
-    this.countIn = 0;
     this.sessionStartedAt = Date.now();
     if (this.metro.running) this.metro.resync();
     this.emit('rz-session-start', {
@@ -230,7 +207,13 @@ export class RzPracticePage extends LitElement {
     this.items = [...this.items, randomItem()];
   }
 
-  /** The sequence the metronome just finished. Never called for a manual skip. */
+  /**
+   * One cycle of the current alankar, sung to the end.
+   *
+   * The metronome no longer moves anyone on, so this is the only thing it
+   * reports: a host counts cycles to know how much practice happened. Never
+   * called for a manual skip — that is not practice.
+   */
   private reportSequenceComplete(index: number) {
     const item = this.items[index];
     if (!item) return;
@@ -239,33 +222,13 @@ export class RzPracticePage extends LitElement {
       alankar: item.alankar.n,
       thaat: item.thaat.key,
       bpm: this.bpm,
-      cycles: this.cyclesPerItem,
     });
   }
 
-  /** Returns false when the session has run out. */
-  private advance(): boolean {
-    // The metronome got through it, so it counts as practice even on repeat.
-    this.reportSequenceComplete(this.index);
-
-    // Repeat-one stays put; the beat maths restarts the count-in on its own.
-    if (this.repeat === 'one') return true;
-
-    if (this.unlimited) {
-      if (this.index >= this.items.length - 1) this.appendRandom();
-      this.index += 1;
-      return true;
-    }
-    if (this.index >= this.items.length - 1) {
-      this.finish();
-      return false;
-    }
-    this.index += 1;
-    this.persistSession();
-    return true;
-  }
-
   private finish() {
+    // Next is pressable from the completion screen too; the session only ends
+    // once, and rz-session-complete is only reported once.
+    if (this.finished) return;
     this.stop();
     this.finished = true;
     this.persistSession();
@@ -280,66 +243,36 @@ export class RzPracticePage extends LitElement {
   private goto(index: number) {
     if (index < 0) return;
     if (index >= this.items.length) {
-      // Unlimited keeps drawing; a fixed session simply stops at the end.
-      if (!this.unlimited) return;
+      // Unlimited keeps drawing. A fixed session ends here instead: with
+      // nothing advancing on its own, Next off the last alankar is the only
+      // moment left that means "done with this one".
+      if (!this.unlimited) {
+        this.finish();
+        return;
+      }
       this.appendRandom();
     }
     // A skip is not practice: no rz-sequence-complete here.
     this.index = index;
     this.finished = false;
     this.beat = 0;
-    this.cycle = 0;
-    this.countIn = 0;
     this.persistSession();
-    // Restart the phase so the new sequence gets its own count-in from sam.
+    // Restart the phase so the new alankar starts from sam.
     this.metro.resync();
   }
 
   /* --------------------------------------------------------------- beats */
 
   /**
-   * Beats the count-in takes. Repeat-one has none: you are drilling the same
-   * alankar over and over, so a 3 · 2 · 1 between every pass would interrupt
-   * the very thing repeat is for. It loops continuously instead.
+   * The alankar loops until Next is pressed, so a beat is only ever its
+   * position in the cycle — one unbroken eight, never a phase that shifts.
+   * `Metronome.strokeFor` already derives sam and the half-way beat from that,
+   * which is why the page no longer overrides it.
    */
-  private get countInBeats(): number {
-    return this.repeat === 'one' ? 0 : COUNT_IN_BEATS;
-  }
-
-  /** Count-in plus the cycles: one sequence's worth of beats. */
-  private get beatsPerSequence(): number {
-    return this.countInBeats + BEATS_PER_CYCLE * this.cyclesPerItem;
-  }
-
-  /**
-   * Scheduled ahead of the beat being heard, so this must be derivable from the
-   * beat number alone — never from state that only becomes true on arrival.
-   */
-  private strokeFor(n: number): 'sam' | 'mid' | 'beat' | 'count' {
-    const lead = this.countInBeats;
-    const into = n % this.beatsPerSequence;
-    if (into < lead) return 'count';
-    const pos = (into - lead) % BEATS_PER_CYCLE;
-    if (pos === 0) return 'sam';
-    return pos === midBeatIndex(BEATS_PER_CYCLE) ? 'mid' : 'beat';
-  }
-
   private handleBeat(n: number) {
-    const total = this.beatsPerSequence;
-    if (n > 0 && n % total === 0 && !this.advance()) return;
-
-    const lead = this.countInBeats;
-    const into = n % total;
-    if (into < lead) {
-      this.countIn = lead - into; // 3, 2, 1
-      this.beat = 0;
-      this.cycle = 0;
-      return;
-    }
-    this.countIn = 0;
-    const p = into - lead;
-    this.beat = p % BEATS_PER_CYCLE;
-    this.cycle = Math.floor(p / BEATS_PER_CYCLE);
+    // Back at sam: the cycle just gone was sung to the end.
+    if (n > 0 && n % BEATS_PER_CYCLE === 0) this.reportSequenceComplete(this.index);
+    this.beat = n % BEATS_PER_CYCLE;
   }
 
   /* ----------------------------------------------------------- transport */
@@ -358,7 +291,6 @@ export class RzPracticePage extends LitElement {
   private stop() {
     this.metro.stop();
     this.playing = false;
-    this.countIn = 0;
   }
 
   private togglePlay() {
@@ -404,10 +336,6 @@ export class RzPracticePage extends LitElement {
         this.reveal = !this.reveal;
         this.persist();
         break;
-      case 'l':
-      case 'L':
-        this.toggleRepeat();
-        break;
       case 'u':
       case 'U':
         this.toggleUnlimited();
@@ -418,19 +346,6 @@ export class RzPracticePage extends LitElement {
   }
 
   /* -------------------------------------------------------------- render */
-
-  private toggleRepeat() {
-    this.repeat = this.repeat === 'one' ? 'all' : 'one';
-    this.persist();
-    this.countIn = 0;
-    // beatsPerSequence changes with the count-in, so the running phase would
-    // otherwise land at an arbitrary point of the new cycle. Restart from sam.
-    if (this.metro.running) {
-      this.beat = 0;
-      this.cycle = 0;
-      this.metro.resync();
-    }
-  }
 
   /**
    * Unlimited is a mode, not a filter: entering it starts a fresh endless
@@ -451,8 +366,6 @@ export class RzPracticePage extends LitElement {
       this.index = restored.index;
       this.finished = false;
       this.beat = 0;
-      this.cycle = 0;
-      this.countIn = 0;
       if (this.metro.running) this.metro.resync();
     } else {
       this.deal();
@@ -483,11 +396,7 @@ export class RzPracticePage extends LitElement {
         beats=${BEATS_PER_CYCLE}
         beat=${this.beat}
         midIndex=${midBeatIndex(BEATS_PER_CYCLE)}
-        cycle=${this.cycle}
-        cyclesPerItem=${this.cyclesPerItem}
         bpm=${this.bpm}
-        countIn=${this.countIn}
-        repeat=${this.repeat}
         ?unlimited=${this.unlimited}
         .enabled=${this.enabled}
         @rz-toggle-settings=${() => this.setPanel('settings')}
@@ -501,20 +410,12 @@ export class RzPracticePage extends LitElement {
         }}
         @rz-goto=${(e: CustomEvent<{ index: number }>) => this.goto(e.detail.index)}
         @rz-play-toggle=${() => this.togglePlay()}
-        @rz-repeat-toggle=${() => this.toggleRepeat()}
         @rz-unlimited-toggle=${() => this.toggleUnlimited()}
         @rz-prev=${() => this.goto(this.index - 1)}
         @rz-next=${() => this.goto(this.index + 1)}
         @rz-tempo-change=${(e: CustomEvent<{ value: number }>) => {
           this.bpm = e.detail.value;
           this.metro.bpm = this.bpm;
-          this.persist();
-        }}
-        @rz-cycles-change=${(e: CustomEvent<{ value: number }>) => {
-          this.cyclesPerItem = e.detail.value;
-          this.beat = 0;
-          this.cycle = 0;
-          if (this.metro.running) this.metro.resync();
           this.persist();
         }}
         @rz-reveal-change=${(e: CustomEvent<{ checked: boolean }>) => {

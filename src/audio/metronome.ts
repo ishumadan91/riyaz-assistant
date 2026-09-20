@@ -8,7 +8,7 @@
  * jitter — that split is the whole design. Do not "simplify" it.
  */
 
-export type Stroke = 'sam' | 'mid' | 'beat' | 'count';
+export type Stroke = 'sam' | 'mid' | 'beat';
 
 /**
  * An 8-beat cycle is heard as 4 + 4, so the half-way beat is marked too —
@@ -27,9 +27,6 @@ const STROKES: Record<Stroke, { type: OscillatorType; from: number; to: number; 
   sam: { type: 'triangle', from: 1180, to: 640, dur: 0.11, gain: 0.9 },
   mid: { type: 'sine', from: 520, to: 300, dur: 0.13, gain: 0.8 },
   beat: { type: 'square', from: 720, to: 520, dur: 0.055, gain: 0.4 },
-  // The count-in. High and thin so it reads as preparation rather than as part
-  // of the cycle — it must never be mistaken for sam.
-  count: { type: 'sine', from: 1560, to: 1180, dur: 0.07, gain: 0.55 },
 };
 
 /** Lazily created: browsers block audio until a user gesture, so the context
@@ -60,8 +57,8 @@ export class Metronome {
   onBeat: (absoluteBeat: number) => void = () => {};
 
   /**
-   * Which stroke an absolute beat gets. The page overrides this so a count-in
-   * can sound different from the cycle.
+   * Which stroke an absolute beat gets. A page can override it to sound
+   * something other than the plain cycle.
    *
    * Must be pure and deterministic: it is called at *schedule* time, up to
    * LOOKAHEAD ahead of the beat being heard, so it cannot read state that will

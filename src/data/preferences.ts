@@ -5,7 +5,12 @@
  * visit deals a fresh one, which is the point of the app.
  *
  * Beats per cycle is absent on purpose — the cycle is fixed at eight and is
- * not a setting.
+ * not a setting. So is how many cycles an alankar gets: it loops until you
+ * press Next, so there is no number to set.
+ *
+ * Stored copies from older versions may still carry `repeat` and
+ * `cyclesPerItem`. Nothing reads them, and validation ignores what it does not
+ * recognise, so they age out harmlessly.
  */
 
 import { OPTIONAL_THAATS } from './thaats.js';
@@ -14,8 +19,6 @@ const STORAGE_KEY = 'riyaz';
 
 export const BPM_MIN = 30;
 export const BPM_MAX = 180;
-export const CYCLES_MIN = 1;
-export const CYCLES_MAX = 8;
 
 /**
  * Where settings are kept.
@@ -51,26 +54,19 @@ export const localStorageAdapter: RiyazStorage = {
   },
 };
 
-/** How the sequence advances when the metronome finishes its cycles. */
-export type RepeatMode = 'all' | 'one';
-
 export interface Preferences {
   bpm: number;
-  cyclesPerItem: number;
   reveal: boolean;
   /** Keys of the optional thaats in the pool. Never empty. */
   enabled: string[];
-  repeat: RepeatMode;
   /** Draw endless random pairings instead of the day's ten. */
   unlimited: boolean;
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
   bpm: 72,
-  cyclesPerItem: 2,
   reveal: false,
   enabled: OPTIONAL_THAATS.map((t) => t.key),
-  repeat: 'all',
   unlimited: false,
 };
 
@@ -105,15 +101,8 @@ export function loadPreferences(storage: RiyazStorage): Preferences {
 
   return {
     bpm: clampInt(stored.bpm, BPM_MIN, BPM_MAX, DEFAULT_PREFERENCES.bpm),
-    cyclesPerItem: clampInt(
-      stored.cyclesPerItem,
-      CYCLES_MIN,
-      CYCLES_MAX,
-      DEFAULT_PREFERENCES.cyclesPerItem,
-    ),
     reveal: typeof stored.reveal === 'boolean' ? stored.reveal : DEFAULT_PREFERENCES.reveal,
     enabled: enabled.length ? enabled : [...DEFAULT_PREFERENCES.enabled],
-    repeat: stored.repeat === 'one' ? 'one' : DEFAULT_PREFERENCES.repeat,
     unlimited:
       typeof stored.unlimited === 'boolean' ? stored.unlimited : DEFAULT_PREFERENCES.unlimited,
   };

@@ -98,19 +98,20 @@ be dealt.
 
 ## The cycle
 
-A new sequence is preceded by a **3-beat count-in** on its own stroke, so all
-the beat maths runs off `beatsPerSequence`, not the cycle length. The count
-stroke is high and thin so it can never be mistaken for sam.
+**The current alankar loops, forever, until Next is pressed.** Nothing advances
+on its own, and there is no count-in, so a beat is only ever `n % 8` — the phase
+can never shift and sam is always sam. That is why the page no longer overrides
+`Metronome.strokeFor`: the metronome's own default already derives sam and the
+half-way beat from the beat number.
 
-**Repeat-one has no count-in** — `countInBeats` returns 0 — so it loops
-continuously. That makes `beatsPerSequence` change when repeat is toggled, which
-shifts the `n % total` phase: `toggleRepeat()` therefore resyncs while playing,
-or the beat would land at an arbitrary point of the new cycle.
+The hook is still there and still has the rule attached to it: `strokeFor` is
+called at **schedule** time, up to LOOKAHEAD ahead of the beat being heard, so
+anything overriding it must be derivable from the beat number alone — never
+from state that only becomes true when the beat arrives.
 
-`Metronome.strokeFor` is the hook that makes this possible: the page decides
-each beat's stroke. It is called at **schedule** time, up to LOOKAHEAD ahead of
-the beat being heard, so it must be derivable from the beat number alone —
-never from state that only becomes true when the beat arrives.
+`handleBeat` reports `rz-sequence-complete` every time it comes back round to
+sam: one cycle sung to the end is the only thing the metronome has left to
+report, since it no longer moves anyone on.
 
 Eight beats, fixed — not a setting. Heard as 4 + 4, so two beats are marked and
 they differ in timbre as well as loudness: sam is a bright triangle and takes
@@ -134,20 +135,21 @@ The context is created lazily (browsers block audio until a gesture) and
 non-gesture-initiated, and an unhandled rejection there can abort scheduling.
 With no Web Audio at all it stays silent rather than throwing.
 
-## Modes
+## Moving on
 
-`repeat` and `unlimited` are preferences, and both change what `advance()` does.
+Only `goto()` changes the alankar — from Next, Prev, a rail click or an arrow
+key. A skip is not practice, so it never reports `rz-sequence-complete`.
 
-- **repeat-one** stays on the current sequence and loops with no count-in. It
-  still reports `rz-sequence-complete` — the metronome did get through it, so it
-  was practice.
-- **unlimited** is a mode, not a filter. Entering it starts a fresh endless
-  stream (`startUnlimited`), and `advance`/`goto` append a `randomItem()` drawn
-  from **all** alankars and **all** thaats — deliberately ignoring both the day's
-  deal and the thaat pool, because it is the "surprise me" mode. It never
-  finishes and never reports `rz-session-complete`. Leaving it restores the day's
-  session, which was never overwritten: `persistSession()` is a no-op while
-  unlimited.
+**Next past the last item finishes the session.** With nothing advancing on its
+own it is the only moment left that means "done", so `goto()` calls `finish()`
+rather than returning early — that is the one path to `rz-session-complete`.
+
+**unlimited** is a mode, not a filter. Entering it starts a fresh endless stream
+(`startUnlimited`), and `goto` appends a `randomItem()` drawn from **all**
+alankars and **all** thaats — deliberately ignoring both the day's deal and the
+thaat pool, because it is the "surprise me" mode. It never finishes and never
+reports `rz-session-complete`. Leaving it restores the day's session, which was
+never overwritten: `persistSession()` is a no-op while unlimited.
 
 ## The day's session
 
@@ -163,7 +165,10 @@ around.
 
 ## Preferences
 
-`data/preferences.ts` owns settings only. Beats per cycle is absent on purpose.
+`data/preferences.ts` owns settings only. Beats per cycle is absent on purpose,
+and so is cycles per alankar — the alankar loops, so there is no number to set.
+A stored copy may still carry `repeat` or `cyclesPerItem` from an older version;
+nothing reads them and validation ignores what it does not recognise.
 Everything is **validated on read**: stored values are user-editable and outlive
 schema changes, so a stale thaat key must never reach the randomiser and the
 pool must never validate to empty.
@@ -195,8 +200,8 @@ pool must never validate to empty.
   with `height: 100%`; the `100dvh` frame lives in `global.css`, which only the
   standalone build loads.
 - **Events report, the host computes.** `rz-session-start`,
-  `rz-sequence-complete`, `rz-session-complete`. A sequence only counts as
-  complete when the *metronome* advanced past it — a manual skip is not practice.
+  `rz-sequence-complete`, `rz-session-complete`. A cycle only counts as practice
+  when the *metronome* sang it through to sam — a manual skip reports nothing.
 
 ## Responsive
 
@@ -205,15 +210,23 @@ Three breakpoints, and each exists for a reason:
 - **768px** — the rail turns from a sidebar into a horizontal strip.
 - **560px** — the phone layout. The header drops the thaat chips so the title
   and the three actions fit on one line (the pair is still on the card's badge
-  and against every rail row); the tempo control drops its label; the cycle
-  readout shortens from "Cycle 1 of 2" to "1/2", which is what lets the beat row
-  and tempo share a line instead of the transport taking three.
-- The `.cycle-long` / `.cycle-short` pair is chosen in CSS rather than JS
-  precisely so the component needs no viewport listener.
+  and against every rail row); the tempo control drops its label, and the rule
+  between play and tempo goes, the gap alone carrying the seam. That is what
+  lets navigation, the beat row and the metronome share one line instead of the
+  transport taking three.
 
 Chrome on a 390×844 phone is 40px of header, 53px of rail and 105px of
 transport, leaving ~646px for the notation. If a change pushes the header or
 transport onto another row, that budget is what it is eating.
+
+## The transport
+
+Two groups with the beat row between them: **which alankar** on the left (prev,
+Next, unlimited), **the metronome** on the right (play, then tempo). Next is the
+only control pressed between alankars, so it is the only filled one and the only
+`lg`; play is `outline` so it stays findable beside the tempo steppers without
+competing. Size and fill are separate props on `rz-icon-button` for exactly this
+reason.
 
 ## Panels
 

@@ -29,13 +29,18 @@ as `<rz-practice-page>`.
 
 | | |
 |---|---|
-| `space` | play / pause |
-| `←` `→` | previous / next sequence (restarts the cycle at sam) |
+| `space` | start / stop the metronome |
+| `←` `→` | previous / next alankar (restarts the cycle at sam) |
 | `n` | new session |
 | `r` | reveal the upcoming sequences |
-| `l` | repeat this alankar / move on |
 | `u` | unlimited mode |
 | `esc` | close settings or about |
+
+The transport has two halves. On the left is **which alankar** — previous, the
+big **Next**, and the unlimited toggle. On the right is **the metronome** —
+play, then tempo. Nothing moves on by itself: the alankar loops until you press
+Next, which is why Next is the one filled control and play is small beside the
+tempo steppers.
 
 Upcoming sequences in the sidebar show `—` to keep the surprise; press `r` or
 tick **Settings → reveal** to see them. Click any row to jump to it.
@@ -45,9 +50,10 @@ either with its Close button, the header button again, or `esc`.
 
 ## The cycle
 
-A new sequence is counted in first — **3 · 2 · 1** on a thin high tick, so there
-is a breather to read the alankar before singing it. The cycle proper starts on
-the beat after. Repeat mode has no count-in: see below.
+The current alankar **loops continuously** — one unbroken eight, from sam,
+until you move on. There is no count-in and no cycle counter: you are drilling
+one thing, and anything between the passes would interrupt exactly what the
+loop is for.
 
 Eight beats are heard as **4 + 4**, so two beats are marked and they sound
 different from each other, not just louder:
@@ -61,14 +67,11 @@ different from each other, not just louder:
 The cycle is fixed at eight beats and is not a setting; the divider is simply
 the half-way beat. A thin rule sits between the halves in the beat row.
 
-## Modes
+## Moving on
 
-The transport carries two toggles, to the right of play.
-
-**Repeat** ⟳ — by default the metronome moves on to the next sequence after its
-cycles. Switch it to repeat-one and it stays on the current alankar and **loops
-continuously**, with no 3 · 2 · 1 between passes: you already know the one you
-are drilling, so a count-in every time round would interrupt the point of it.
+**Next** is the only thing that changes the alankar, and pressing it on the last
+of the ten finishes the session — with nothing advancing on its own, that is the
+one remaining moment that means "done".
 
 **Unlimited** ∞ — instead of the day's ten, keep drawing: every Next deals a
 fresh pairing from *all* 53 alankars and *all* ten thaats, ignoring both the
@@ -83,8 +86,8 @@ pool** ticks the other nine on and off; the randomiser only ever draws the
 paired thaat from the ticked ones. The last ticked thaat cannot be unticked —
 the pairing needs somewhere to go.
 
-Tempo, the thaat pool, cycles per alankar, reveal and both modes persist in
-`localStorage` under the key `riyaz`.
+Tempo, the thaat pool, reveal and unlimited persist in `localStorage` under the
+key `riyaz`.
 
 **The day's session is kept until midnight.** Refreshing resumes the same ten
 sequences at the same position rather than re-rolling them, so a reload mid-riyaz

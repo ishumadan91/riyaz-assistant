@@ -8,7 +8,6 @@ import '../../organisms/sequence-rail/rz-sequence-rail.js';
 import '../../organisms/session-complete/rz-session-complete.js';
 import '../../organisms/settings-panel/rz-settings-panel.js';
 import '../../organisms/transport-bar/rz-transport-bar.js';
-import type { RepeatMode } from '../../organisms/transport-bar/rz-transport-bar.js';
 import type { SessionItem } from '../../../data/session.js';
 import type { Thaat } from '../../../data/thaats.js';
 
@@ -79,11 +78,7 @@ export class RzPracticeTemplate extends LitElement {
   @property({ type: Number }) beats = 8;
   @property({ type: Number }) beat = 0;
   @property({ type: Number }) midIndex = 4;
-  @property({ type: Number }) cycle = 0;
-  @property({ type: Number }) cyclesPerItem = 2;
   @property({ type: Number }) bpm = 72;
-  @property({ type: Number }) countIn = 0;
-  @property({ type: String }) repeat: RepeatMode = 'all';
   @property({ type: Boolean }) unlimited = false;
   @property({ attribute: false }) enabled: string[] = [];
 
@@ -98,7 +93,6 @@ export class RzPracticeTemplate extends LitElement {
 
       ${this.panel === 'settings'
         ? html`<rz-settings-panel
-            .cyclesPerItem=${this.cyclesPerItem}
             ?reveal=${this.reveal}
             .enabled=${this.enabled}
           ></rz-settings-panel>`
@@ -133,11 +127,7 @@ export class RzPracticeTemplate extends LitElement {
         beats=${this.beats}
         beat=${this.beat}
         midIndex=${this.midIndex}
-        cycle=${this.cycle}
-        cyclesPerItem=${this.cyclesPerItem}
         bpm=${this.bpm}
-        countIn=${this.countIn}
-        repeat=${this.repeat}
         ?unlimited=${this.unlimited}
       ></rz-transport-bar>
     `;

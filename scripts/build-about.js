@@ -17,7 +17,7 @@ const SECTIONS = [
   { heading: null,          title: 'Riyāz' },
   { heading: 'Using it',    title: 'Using it' },
   { heading: 'The cycle',   title: 'The cycle' },
-  { heading: 'Modes',       title: 'Modes' },
+  { heading: 'Moving on',   title: 'Moving on' },
   { heading: 'Thaats',      title: 'Thaats' },
   { heading: 'Notation',    title: 'Notation' },
   { heading: 'Licence',     title: 'Licence' }

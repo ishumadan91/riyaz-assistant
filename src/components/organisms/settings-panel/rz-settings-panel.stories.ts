@@ -14,14 +14,12 @@ type Story = StoryObj;
 
 export const AllThaats: Story = {
   render: () => html`<rz-settings-panel
-    cyclesPerItem="2"
     .enabled=${OPTIONAL_THAATS.map((t) => t.key)}
   ></rz-settings-panel>`,
 };
 
 export const Narrowed: Story = {
   render: () => html`<rz-settings-panel
-    cyclesPerItem="4"
     reveal
     .enabled=${['kafi', 'bhairav']}
   ></rz-settings-panel>`,

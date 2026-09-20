@@ -4,13 +4,22 @@ import { base } from '../../../styles/base.js';
 import '../icon/rz-icon.js';
 import type { IconName } from '../icon/icon-registry.js';
 
-export type IconButtonVariant = 'plain' | 'filled';
+export type IconButtonVariant = 'plain' | 'outline' | 'filled';
+export type IconButtonSize = 'sm' | 'md' | 'lg';
 
 /**
  * rz-icon-button — a round icon control, the transport's building block.
  *
- *   - `plain`  → borderless; prev / next / the mode toggles.
- *   - `filled` → primary disc; the play button.
+ *   - `plain`   → borderless; prev and the mode toggles.
+ *   - `outline` → ringed and in `--color-primary`; play, which has to be
+ *                 findable beside the tempo steppers without competing with
+ *                 Next.
+ *   - `filled`  → primary disc; Next, the one control pressed between alankars.
+ *
+ * Size and fill are separate: the transport's hierarchy is `lg` + `filled` for
+ * Next against `sm` for everything else. `sm` also drops to `--color-muted`,
+ * because at this size a control is secondary by definition — a small button
+ * in heading ink still reads as a peer of the big one.
  *
  * `active` marks a mode toggle that is on, in `--color-primary`.
  *
@@ -41,6 +50,7 @@ export class RzIconButton extends LitElement {
       transition:
         background 0.15s ease,
         color 0.15s ease,
+        border-color 0.15s ease,
         transform 0.05s ease;
     }
     button:hover:not([disabled]) {
@@ -57,10 +67,30 @@ export class RzIconButton extends LitElement {
       opacity: 0.4;
       cursor: not-allowed;
     }
+    :host([size='sm']) button {
+      width: 1.875rem;
+      height: 1.875rem;
+      font-size: 0.9375rem;
+      color: var(--color-muted);
+    }
+    :host([size='sm']) button:hover:not([disabled]) {
+      color: var(--color-heading);
+    }
+    :host([size='lg']) button {
+      width: 3.25rem;
+      height: 3.25rem;
+      font-size: 1.4375rem;
+    }
+    :host([variant='outline']) button {
+      color: var(--color-primary);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+    }
+    :host([variant='outline']) button:hover:not([disabled]) {
+      background: var(--color-teal-100);
+      border-color: var(--color-primary);
+    }
     :host([variant='filled']) button {
-      width: 2.75rem;
-      height: 2.75rem;
-      font-size: 1.25rem;
       color: var(--color-primary-contrast);
       background: var(--color-primary);
       box-shadow: var(--shadow-sm);
@@ -77,6 +107,7 @@ export class RzIconButton extends LitElement {
 
   @property({ type: String }) icon: IconName = 'play';
   @property({ type: String, reflect: true }) variant: IconButtonVariant = 'plain';
+  @property({ type: String, reflect: true }) size: IconButtonSize = 'md';
   @property({ type: Boolean, reflect: true }) active = false;
   @property({ type: Boolean, reflect: true }) disabled = false;
   @property({ type: String }) label = '';
