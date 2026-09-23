@@ -15,17 +15,22 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-/** Upcoming rows are masked — that is what keeps the order a surprise. */
-export const Masked: Story = {
+/** Every sequence is visible: done above, the current one, the rest below. */
+export const Default: Story = {
   render: () =>
     html`<div style="height:420px;display:flex">
       <rz-sequence-rail .items=${session.items} index="2"></rz-sequence-rail>
     </div>`,
 };
 
-export const Revealed: Story = {
+/** The unlimited stream, where the list is what has been drawn so far. */
+export const Unlimited: Story = {
   render: () =>
     html`<div style="height:420px;display:flex">
-      <rz-sequence-rail .items=${session.items} index="2" reveal></rz-sequence-rail>
+      <rz-sequence-rail
+        .items=${session.items.slice(0, 4)}
+        index="3"
+        heading="Practised"
+      ></rz-sequence-rail>
     </div>`,
 };

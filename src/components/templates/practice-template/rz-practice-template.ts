@@ -2,16 +2,21 @@ import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { base } from '../../../styles/base.js';
 import '../../organisms/about-sheet/rz-about-sheet.js';
+import '../../organisms/alankar-browser/rz-alankar-browser.js';
 import '../../organisms/alankar-card/rz-alankar-card.js';
 import '../../organisms/app-header/rz-app-header.js';
 import '../../organisms/sequence-rail/rz-sequence-rail.js';
 import '../../organisms/session-complete/rz-session-complete.js';
 import '../../organisms/settings-panel/rz-settings-panel.js';
 import '../../organisms/transport-bar/rz-transport-bar.js';
-import type { SessionItem } from '../../../data/session.js';
+import { DEFAULT_ORDER, type SessionItem, type SessionOrder } from '../../../data/session.js';
 import type { Thaat } from '../../../data/thaats.js';
 
-export type Panel = 'settings' | 'about' | null;
+/**
+ * Which drop-down or overlay is open. One value, not three booleans that can
+ * disagree — and Escape closes whichever it is.
+ */
+export type Panel = 'settings' | 'about' | 'browse' | null;
 
 /**
  * rz-practice-template — the practice screen's layout: header, an optional
@@ -70,7 +75,6 @@ export class RzPracticeTemplate extends LitElement {
   @property({ attribute: false }) items: SessionItem[] = [];
   @property({ attribute: false }) thaats: Thaat[] = [];
   @property({ type: Number }) index = 0;
-  @property({ type: Boolean }) reveal = false;
   @property({ type: Boolean }) finished = false;
   @property({ type: String }) panel: Panel = null;
 
@@ -81,6 +85,9 @@ export class RzPracticeTemplate extends LitElement {
   @property({ type: Number }) bpm = 72;
   @property({ type: Boolean }) unlimited = false;
   @property({ attribute: false }) enabled: string[] = [];
+  @property({ type: String }) order: SessionOrder = DEFAULT_ORDER;
+  /** The thaat the alankar list is shown in, while it is open. */
+  @property({ type: String }) browseThaat = 'bilawal';
 
   render() {
     const current = this.items[this.index];
@@ -93,17 +100,22 @@ export class RzPracticeTemplate extends LitElement {
 
       ${this.panel === 'settings'
         ? html`<rz-settings-panel
-            ?reveal=${this.reveal}
+            order=${this.order}
             .enabled=${this.enabled}
           ></rz-settings-panel>`
         : nothing}
       ${this.panel === 'about' ? html`<rz-about-sheet></rz-about-sheet>` : nothing}
+      <!-- The browser is an overlay, not a drop-down, and is only in the tree
+           while it is open: it claims the viewport, which an embedded host's
+           layout would otherwise have to live with. -->
+      ${this.panel === 'browse'
+        ? html`<rz-alankar-browser thaatKey=${this.browseThaat}></rz-alankar-browser>`
+        : nothing}
 
       <div class="main">
         <rz-sequence-rail
           .items=${this.items}
           index=${this.index}
-          ?reveal=${this.reveal || this.unlimited}
           heading=${this.unlimited ? 'Practised' : 'Sequence'}
         ></rz-sequence-rail>
 

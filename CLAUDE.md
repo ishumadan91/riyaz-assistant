@@ -24,11 +24,12 @@ src/
                 preferences.ts, about.ts (GENERATED)
   audio/        metronome.ts
   components/
-    atoms/      button, badge, card, swara, checkbox, number-field, field-label
+    atoms/      button, badge, card, swara, checkbox, number-field, field-label,
+                icon, icon-button
     molecules/  notation-line, beat-row, tempo-control, rail-item,
-                thaat-pool, alankar-part
+                thaat-pool, alankar-part, choice-group
     organisms/  app-header, settings-panel, about-sheet, sequence-rail,
-                alankar-card, transport-bar, session-complete
+                alankar-card, alankar-browser, transport-bar, session-complete
     templates/  practice-template   (layout, no state)
     pages/      practice-page       (owns state, drives the metronome)
   main.ts       standalone entry — sets globalKeys, focuses the page
@@ -73,7 +74,17 @@ it. Three things are load-bearing:
   non-Bilawal thaat renders wrong.
 - **A dot binds to the swara it touches.** `S.` is taar, `.N` is mandra. The
   parser consumes a trailing dot before it can be mistaken for a leading one;
-  keep that ordering.
+  keep that ordering. Between two swaras that ordering *is* the tie-break —
+  `S.ND` is taar sa — and it is right far more often than not, because a dot
+  mid-run is usually a descent from taar sa.
+
+- **`(…)` is a binding fence, not a mark.** It never renders; all it does is
+  end the reach of the dots either side of it, so its contents scan as a run of
+  their own. That is the only way to write a descent *below* sa mid-phrase:
+  `S(.N)(.D)(.P)` is sa and three mandra swaras, where the bare `S.N.D.P`
+  reads as three taar ones. Alankars 38, 43, 44, 45 and 46 depend on it. An
+  unmatched bracket is rendered rather than guessed at — a visible bracket
+  reads as the typo it is, where a silently mis-bound dot looks like notation.
 - **Space-separated grouping is deliberate.** Each swara is an inline-block, so
   without the nowrap run a line breaks between any two of them and splits a
   phrase. The grouping lives in the token model, not just in CSS.
@@ -84,6 +95,26 @@ line *and* a dot below the same letter. Tracking comes from `margin`, not
 `letter-spacing`, so each glyph's box is exactly the letter and adjacent komal
 rules don't run together.
 
+## Sequence order
+
+Five alankars × two thaats is ten sequences, and `SessionOrder` decides how
+they are laid out: `shuffled` (the default), `by-thaat` (all five in Bilawal,
+then all five in the pair) and `paired` (each alankar followed by its
+counterpart). `orderItems()` owns
+all three; **Bilawal is sequence 1 under every one of them**, and only
+`shuffled` has to arrange that with a swap.
+
+Unlike the thaat pool, the preference applies **at once**: `reorderSession()`
+permutes the ten already dealt rather than dealing again, so the day's session
+survives it, and the page keeps the current item under the cursor — a re-lay
+that stays on the same alankar must not resync the metronome mid-cycle. A
+setting that waited for the next deal read as broken, because picking it
+changed nothing on screen.
+
+`reorderSession()` reads the alankars and thaats back out of the items in
+first-seen order, which is why it needs no record of the original deal: Bilawal
+is sequence 1 of every layout, so it is always the first thaat seen.
+
 ## Thaats
 
 All 53 alankars are stored **in Bilawal only**; every other thaat is derived at
@@ -91,7 +122,7 @@ render time by substituting the five variable swaras. Adding an alankar means
 adding one Bilawal entry.
 
 Bilawal is compulsory and is always sequence 1 — `newSession()` shuffles, then
-swaps a Bilawal item into position 0. The rest stay a surprise. The other nine
+swaps a Bilawal item into position 0. The other nine
 are a user-controlled pool that **can never be empty**; `rz-thaat-pool` refuses
 the last untick, because a session with nothing to pair Bilawal against cannot
 be dealt.
@@ -230,6 +261,30 @@ reason.
 
 ## Panels
 
-Settings and About are mutually exclusive and Escape closes whichever is open.
-This is one page state (`panel: 'settings' | 'about' | null`), not two booleans
-that can disagree.
+Settings, About and the alankar browser are mutually exclusive and Escape
+closes whichever is open. This is one page state
+(`panel: 'settings' | 'about' | 'browse' | null`), not three booleans that can
+disagree.
+
+Settings and About drop down beneath the header. The browser is an **overlay**
+instead, and is only in the tree while it is open — it is the one thing that
+claims the viewport, and an embedded host must not have to live with that the
+rest of the time.
+
+## The rail shows everything
+
+There is no reveal toggle and no masking: every dealt sequence is listed, and
+`rz-rail-item` has no `masked` state to fall back to. A stored preferences
+object may still carry `reveal`; nothing reads it and validation drops it.
+
+## The alankar browser
+
+`rz-alankar-browser` shows all 53 at once, transposed live into one thaat, and
+is reached from **Browse all** above the sequence rail (or `a`). It is a
+**reference, not navigation**: there is deliberately no "practise this one"
+control: an alankar in the list is usually not in today's deal at all, and the
+rail beside it already jumps to the ones that are.
+
+`browseThaat` is page state like everything else, seeded from the thaat being
+practised each time the list is *opened* — seeding it on every render would
+undo the picker the moment it was used.

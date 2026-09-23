@@ -8,17 +8,22 @@
  * not a setting. So is how many cycles an alankar gets: it loops until you
  * press Next, so there is no number to set.
  *
- * Stored copies from older versions may still carry `repeat` and
- * `cyclesPerItem`. Nothing reads them, and validation ignores what it does not
+ * Stored copies from older versions may still carry `repeat`, `cyclesPerItem`
+ * or `reveal` — the last from when upcoming sequences were hidden behind a
+ * toggle. Nothing reads them, and validation ignores what it does not
  * recognise, so they age out harmlessly.
  */
 
 import { OPTIONAL_THAATS } from './thaats.js';
+import { DEFAULT_ORDER, type SessionOrder } from './session.js';
 
 const STORAGE_KEY = 'riyaz';
 
 export const BPM_MIN = 30;
 export const BPM_MAX = 180;
+
+/** The valid `order` values, for validation on read. */
+const ORDERS: readonly SessionOrder[] = ['shuffled', 'by-thaat', 'paired'];
 
 /**
  * Where settings are kept.
@@ -56,18 +61,19 @@ export const localStorageAdapter: RiyazStorage = {
 
 export interface Preferences {
   bpm: number;
-  reveal: boolean;
   /** Keys of the optional thaats in the pool. Never empty. */
   enabled: string[];
   /** Draw endless random pairings instead of the day's ten. */
   unlimited: boolean;
+  /** How the next deal lays its ten sequences out. */
+  order: SessionOrder;
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
   bpm: 72,
-  reveal: false,
   enabled: OPTIONAL_THAATS.map((t) => t.key),
   unlimited: false,
+  order: DEFAULT_ORDER,
 };
 
 function clampInt(v: unknown, min: number, max: number, fallback: number): number {
@@ -101,10 +107,12 @@ export function loadPreferences(storage: RiyazStorage): Preferences {
 
   return {
     bpm: clampInt(stored.bpm, BPM_MIN, BPM_MAX, DEFAULT_PREFERENCES.bpm),
-    reveal: typeof stored.reveal === 'boolean' ? stored.reveal : DEFAULT_PREFERENCES.reveal,
     enabled: enabled.length ? enabled : [...DEFAULT_PREFERENCES.enabled],
     unlimited:
       typeof stored.unlimited === 'boolean' ? stored.unlimited : DEFAULT_PREFERENCES.unlimited,
+    order: ORDERS.includes(stored.order as SessionOrder)
+      ? (stored.order as SessionOrder)
+      : DEFAULT_PREFERENCES.order,
   };
 }
 

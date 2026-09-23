@@ -20,7 +20,7 @@ export const AllThaats: Story = {
 
 export const Narrowed: Story = {
   render: () => html`<rz-settings-panel
-    reveal
+    order="paired"
     .enabled=${['kafi', 'bhairav']}
   ></rz-settings-panel>`,
 };

@@ -31,7 +31,7 @@ export const Embedded: Story = {
     html`<div style="height:680px">
       <rz-practice-page
         .storage=${memory({
-          riyaz: { bpm: 108, reveal: true, enabled: ['bhairav', 'marwa'] },
+          riyaz: { bpm: 108, order: 'paired', enabled: ['bhairav', 'marwa'] },
         })}
       ></rz-practice-page>
     </div>`,

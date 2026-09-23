@@ -3,8 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { base } from '../../../styles/base.js';
 
 /**
- * rz-checkbox — a bordered, tickable row. Used for the reveal toggle and for
- * every thaat in the pool.
+ * rz-checkbox — a bordered, tickable row. Used for every thaat in the pool.
  *
  * @prop  {boolean} checked
  * @fires rz-checkbox-change - CustomEvent<{ checked: boolean }>

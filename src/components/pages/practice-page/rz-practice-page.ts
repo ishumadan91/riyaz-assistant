@@ -12,8 +12,15 @@ import {
   type RiyazStorage,
 } from '../../../data/preferences.js';
 import { loadDaySession, saveDaySession } from '../../../data/day-session.js';
-import { newSession, randomItem, type SessionItem } from '../../../data/session.js';
-import type { Thaat } from '../../../data/thaats.js';
+import {
+  DEFAULT_ORDER,
+  newSession,
+  randomItem,
+  reorderSession,
+  type SessionItem,
+  type SessionOrder,
+} from '../../../data/session.js';
+import { DEFAULT_THAAT, type Thaat } from '../../../data/thaats.js';
 
 /** The cycle is fixed at eight beats, heard as 4 + 4. Not a setting. */
 const BEATS_PER_CYCLE = 8;
@@ -79,9 +86,13 @@ export class RzPracticePage extends LitElement {
   @state() private beat = 0;
 
   @state() private bpm = 72;
-  @state() private reveal = false;
   @state() private enabled: string[] = [];
   @state() private unlimited = false;
+  @state() private order: SessionOrder = DEFAULT_ORDER;
+  /** Which thaat the alankar list is shown in. View state, so it is not
+      persisted — it is set from whatever is being practised when the list
+      opens, which is the answer wanted nine times in ten. */
+  @state() private browseThaat = DEFAULT_THAAT.key;
 
   private metro = new Metronome();
   private sessionStartedAt = 0;
@@ -142,17 +153,17 @@ export class RzPracticePage extends LitElement {
 
   private applyPreferences(p: Preferences) {
     this.bpm = p.bpm;
-    this.reveal = p.reveal;
     this.enabled = p.enabled;
     this.unlimited = p.unlimited;
+    this.order = p.order;
   }
 
   private persist() {
     savePreferences(this.storage, {
       bpm: this.bpm,
-      reveal: this.reveal,
       enabled: this.enabled,
       unlimited: this.unlimited,
+      order: this.order,
     });
   }
 
@@ -170,7 +181,7 @@ export class RzPracticePage extends LitElement {
   /* ------------------------------------------------------------- session */
 
   private deal() {
-    const session = newSession(this.enabled);
+    const session = newSession(this.enabled, this.order);
     this.items = session.items;
     this.thaats = session.thaats;
     this.index = 0;
@@ -184,6 +195,38 @@ export class RzPracticePage extends LitElement {
       alankars: [...new Set(session.items.map((i) => i.alankar.n))],
       restored: false,
     });
+  }
+
+  /**
+   * Re-lay the deal already on screen, keeping the student on the sequence
+   * they were on.
+   *
+   * The same five alankars and the same two thaats, rearranged — not new
+   * material, so the day's session survives it. Applied the moment the order
+   * is picked: a setting that only took effect on some later deal looked
+   * broken, because picking it changed nothing you could see.
+   */
+  private applyOrder() {
+    // An unlimited stream is drawn one at a time and has no layout to impose.
+    if (this.unlimited) return;
+    const items = reorderSession(this.items, this.order);
+    if (!items) return;
+
+    const current = this.items[this.index];
+    this.items = items;
+    const at = current
+      ? items.findIndex(
+          (i) => i.alankar.n === current.alankar.n && i.thaat.key === current.thaat.key,
+        )
+      : -1;
+    this.index = at >= 0 ? at : 0;
+    this.persistSession();
+    // Only a move to a *different* alankar restarts the phase; staying on the
+    // same one through a re-lay must not interrupt the cycle being sung.
+    if (at < 0) {
+      this.beat = 0;
+      if (this.metro.running) this.metro.resync();
+    }
   }
 
   /** Start an unlimited stream: one random pairing, extended as you go. */
@@ -331,14 +374,13 @@ export class RzPracticePage extends LitElement {
       case 'N':
         this.deal();
         break;
-      case 'r':
-      case 'R':
-        this.reveal = !this.reveal;
-        this.persist();
-        break;
       case 'u':
       case 'U':
         this.toggleUnlimited();
+        break;
+      case 'a':
+      case 'A':
+        this.openBrowse();
         break;
       default:
         break;
@@ -372,6 +414,18 @@ export class RzPracticePage extends LitElement {
     }
   }
 
+  /**
+   * Open the alankar list on the thaat being practised — a list of all 53 in
+   * Todi is not what someone drilling in Kafi asked for. Only on the way *in*:
+   * reselecting inside the list must not be undone by a re-render.
+   */
+  private openBrowse() {
+    if (this.panel !== 'browse') {
+      this.browseThaat = this.items[this.index]?.thaat.key ?? DEFAULT_THAAT.key;
+    }
+    this.setPanel('browse');
+  }
+
   private setPanel(next: Panel) {
     // One panel at a time, as a single value rather than two booleans that can
     // disagree with each other.
@@ -389,7 +443,6 @@ export class RzPracticePage extends LitElement {
         .items=${this.items}
         .thaats=${chips}
         index=${this.index}
-        ?reveal=${this.reveal}
         ?finished=${this.finished}
         panel=${this.panel ?? ''}
         ?playing=${this.playing}
@@ -399,7 +452,12 @@ export class RzPracticePage extends LitElement {
         bpm=${this.bpm}
         ?unlimited=${this.unlimited}
         .enabled=${this.enabled}
+        order=${this.order}
+        browseThaat=${this.browseThaat}
         @rz-toggle-settings=${() => this.setPanel('settings')}
+        @rz-toggle-browse=${() => this.openBrowse()}
+        @rz-browse-thaat-change=${(e: CustomEvent<{ key: string }>) =>
+          (this.browseThaat = e.detail.key)}
         @rz-toggle-about=${() => this.setPanel('about')}
         @rz-close-panel=${() => (this.panel = null)}
         @rz-new-session=${() => this.deal()}
@@ -418,13 +476,14 @@ export class RzPracticePage extends LitElement {
           this.metro.bpm = this.bpm;
           this.persist();
         }}
-        @rz-reveal-change=${(e: CustomEvent<{ checked: boolean }>) => {
-          this.reveal = e.detail.checked;
-          this.persist();
-        }}
         @rz-thaat-pool-change=${(e: CustomEvent<{ enabled: string[] }>) => {
           this.enabled = e.detail.enabled;
           this.persist();
+        }}
+        @rz-order-change=${(e: CustomEvent<{ order: SessionOrder }>) => {
+          this.order = e.detail.order;
+          this.persist();
+          this.applyOrder();
         }}
       ></rz-practice-template>
     `;

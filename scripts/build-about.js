@@ -18,6 +18,7 @@ const SECTIONS = [
   { heading: 'Using it',    title: 'Using it' },
   { heading: 'The cycle',   title: 'The cycle' },
   { heading: 'Moving on',   title: 'Moving on' },
+  { heading: 'Sequence order', title: 'Sequence order' },
   { heading: 'Thaats',      title: 'Thaats' },
   { heading: 'Notation',    title: 'Notation' },
   { heading: 'Licence',     title: 'Licence' }

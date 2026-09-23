@@ -5,9 +5,10 @@
 A metronome-driven alankar drill for Hindustani vocal riyaz, built on the
 **LWCG design system**. Each session deals five alankars at random and two
 thaats — Bilawal always, plus one drawn at random from the thaats you have
-enabled — crosses them into ten sequences, and shuffles the order. The first
-sequence is always Bilawal; after that the order is a surprise. The metronome
-runs **2 cycles of 8 beats** per sequence, then moves on by itself.
+enabled — and crosses them into ten sequences. The first sequence is always
+Bilawal, and **Settings → sequence order** decides how the rest are laid out.
+The metronome loops the current alankar in **cycles of 8 beats** until you
+press Next; nothing moves on by itself.
 
 ## Running it
 
@@ -32,9 +33,9 @@ as `<rz-practice-page>`.
 | `space` | start / stop the metronome |
 | `←` `→` | previous / next alankar (restarts the cycle at sam) |
 | `n` | new session |
-| `r` | reveal the upcoming sequences |
 | `u` | unlimited mode |
-| `esc` | close settings or about |
+| `a` | browse every alankar |
+| `esc` | close settings, about, or the alankar list |
 
 The transport has two halves. On the left is **which alankar** — previous, the
 big **Next**, and the unlimited toggle. On the right is **the metronome** —
@@ -42,8 +43,15 @@ play, then tempo. Nothing moves on by itself: the alankar loops until you press
 Next, which is why Next is the one filled control and play is small beside the
 tempo steppers.
 
-Upcoming sequences in the sidebar show `—` to keep the surprise; press `r` or
-tick **Settings → reveal** to see them. Click any row to jump to it.
+The sidebar lists every sequence in the session — done, current and upcoming.
+Click any row to jump to it.
+
+**Browse all** — above the sequence list — opens every alankar at once in one
+scrolling modal, grouped the way the book groups them, with a thaat picker at
+the top that transposes all 53 on the spot. It opens on whichever thaat you are
+practising. It is a reference, not a way to get around: there is no "practise
+this one" button, because the list would otherwise give away which five the day
+dealt.
 
 **Settings** and **About** open from the header and drop down beneath it; close
 either with its Close button, the header button again, or `esc`.
@@ -79,6 +87,22 @@ day's session and the thaat pool. It never ends and never reports a finished
 session. Turning it off returns you to the day's session exactly where you left
 it — the stream never overwrites it.
 
+## Sequence order
+
+Five alankars crossed with two thaats makes ten sequences, and **Settings →
+sequence order** decides how they are laid out:
+
+| | |
+|---|---|
+| **Shuffled** | the order they were randomised into — the default |
+| **By thaat** | all five in Bilawal, then the same five in the paired thaat |
+| **Paired** | each alankar in Bilawal, then straight into its counterpart |
+
+Bilawal is sequence 1 under all three. Changing it re-lays the session you are
+already in, straight away — it is the same five alankars and the same two
+thaats rearranged, not new material, and you stay on the sequence you were
+practising.
+
 ## Thaats
 
 Bilawal is compulsory and always the first sequence. **Settings → thaats in the
@@ -86,8 +110,8 @@ pool** ticks the other nine on and off; the randomiser only ever draws the
 paired thaat from the ticked ones. The last ticked thaat cannot be unticked —
 the pairing needs somewhere to go.
 
-Tempo, the thaat pool, reveal and unlimited persist in `localStorage` under the
-key `riyaz`.
+Tempo, the thaat pool, unlimited and the sequence order persist in
+`localStorage` under the key `riyaz`.
 
 **The day's session is kept until midnight.** Refreshing resumes the same ten
 sequences at the same position rather than re-rolling them, so a reload mid-riyaz
@@ -137,6 +161,21 @@ Data is ASCII (`S R G m P D N`, `S.` taar, `.N` mandra) and renders in
 Bhatkhande style: komal underlined, teevra madhyam overlined, upper octave
 dotted above, lower octave dotted below. Each space-separated group renders as
 one nowrap run, so a phrase never breaks mid-group.
+
+A dot between two swaras is genuinely ambiguous — in `S.ND` it could be the
+taar of S or the mandra of N. Unmarked, it always binds **backwards**, which is
+right nearly every time: `S.NDPmGRS` is a descent from taar sa. Where it is
+not, **brackets** say which swara the dot belongs to, and are never rendered:
+
+| | |
+|---|---|
+| `.P.D.N` | a dot with nothing behind it is unambiguous — all three are mandra |
+| `PDNS.` | a dot at the end is unambiguous — only the last S is taar |
+| `S(.N)(.D)(.P)` | sa, then three mandra swaras — bare `S.N.D.P` would read as three taar ones |
+| `(S.)NDP` | spells out a taar S the scan would have reached anyway |
+
+Brackets never span a space: a space already separates, so there is nothing
+inside one for them to do.
 
 ## Files
 

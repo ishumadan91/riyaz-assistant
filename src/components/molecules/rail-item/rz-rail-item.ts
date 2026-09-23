@@ -5,16 +5,10 @@ import { base } from '../../../styles/base.js';
 /**
  * rz-rail-item — one row of the sequence rail.
  *
- * The upcoming-sequence state is called `masked`, not `hidden`: `hidden` is a
- * global HTML attribute, so a reflecting property of that name would set
- * `display: none` on the host via the UA stylesheet and the row would vanish
- * instead of showing its placeholder.
- *
  * @prop  {number} index - 1-based position shown at the left
- * @prop  {string} label - "23 · Todi", or ignored when masked
+ * @prop  {string} label - "23 · Todi"
  * @prop  {boolean} active
  * @prop  {boolean} done
- * @prop  {boolean} masked - upcoming, kept a surprise
  * @fires click - native; the rail turns it into rz-goto
  */
 @customElement('rz-rail-item')
@@ -72,13 +66,12 @@ export class RzRailItem extends LitElement {
   @property({ type: String }) label = '';
   @property({ type: Boolean, reflect: true }) active = false;
   @property({ type: Boolean, reflect: true }) done = false;
-  @property({ type: Boolean, reflect: true }) masked = false;
 
   render() {
     return html`
       <button type="button" aria-current=${this.active ? 'true' : 'false'}>
         <span class="n">${this.index}</span>
-        <span>${this.masked ? '—' : this.label}</span>
+        <span>${this.label}</span>
       </button>
     `;
   }

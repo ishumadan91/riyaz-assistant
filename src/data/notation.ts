@@ -4,6 +4,15 @@
  * The old implementation returned an HTML string for `innerHTML`. Lit templates
  * do not take HTML strings, so parsing and rendering are now split: this module
  * produces a token model and `rz-notation-line` renders it into `rz-swara`.
+ *
+ * A dot binds to the swara it touches: `S.` is taar, `.N` is mandra. Between
+ * two swaras that is genuinely ambiguous — in `S.ND` the dot could be the taar
+ * of S or the mandra of N, and only the person writing the phrase knows which.
+ * The scan resolves it backwards, so an unmarked dot is always the taar of the
+ * swara before it. That is right far more often than not: `S.NDPmGRS` is a
+ * descent from taar sa.
+ *
+ * Where it is *not* right, brackets say so — see `(`/`)` below.
  */
 
 export type Saptak = 'mandra' | 'madhya' | 'taar';
@@ -36,6 +45,19 @@ const SWARA = 'SRGmPDNrgdnM';
 
 const isSwara = (c: string | undefined): boolean => !!c && SWARA.includes(c);
 
+/**
+ * Index of the `)` closing the `(` at `open`, or -1 if there is none.
+ * Counts depth, so a nested pair does not close the outer one early.
+ */
+function closingParen(text: string, open: number): number {
+  let depth = 0;
+  for (let i = open; i < text.length; i++) {
+    if (text[i] === '(') depth++;
+    else if (text[i] === ')' && --depth === 0) return i;
+  }
+  return -1;
+}
+
 function swara(c: string, saptak: Saptak): NotationToken {
   return {
     kind: 'swara',
@@ -47,12 +69,38 @@ function swara(c: string, saptak: Saptak): NotationToken {
   };
 }
 
-function parseGroup(text: string): NotationToken[] {
-  const tokens: NotationToken[] = [];
+/**
+ * Scan one run, appending to `tokens`.
+ *
+ * `(…)` is a **binding fence**, not a mark: it is never rendered, and all it
+ * does is end the reach of the dots on either side of it. Its contents are
+ * scanned as a run of their own, so a dot first in the brackets has no swara
+ * behind it to bind to and a swara last in them has no dot ahead to claim —
+ * which is exactly what makes `S(.N)(.D)(.P)` read as sa and three mandra
+ * swaras where the bare `S.N.D.P` would read as three taar ones. `(S.)ND`
+ * forces the binding the other way, spelling out a taar S the scan would have
+ * reached anyway.
+ *
+ * Brackets never span a space: `parseNotation` splits on spaces first, and a
+ * space already separates, so there is nothing inside one for a fence to do.
+ */
+function parseRun(text: string, tokens: NotationToken[]): void {
   let i = 0;
 
   while (i < text.length) {
     const c = text[i];
+
+    if (c === '(') {
+      const close = closingParen(text, i);
+      if (close !== -1) {
+        parseRun(text.slice(i + 1, close), tokens);
+        i = close + 1;
+        continue;
+      }
+      // Unmatched: fall through and render the bracket. A stray one is a typo
+      // in the data, and a visible bracket says so — far better than silently
+      // binding a dot the wrong way, which looks like real notation.
+    }
 
     // A dot bound to the swara *before* it is taar, and the swara branch below
     // consumes it. So any dot reaching here belongs to the swara that follows.
@@ -70,7 +118,11 @@ function parseGroup(text: string): NotationToken[] {
     tokens.push({ kind: 'punct', text: c });
     i += 1;
   }
+}
 
+function parseGroup(text: string): NotationToken[] {
+  const tokens: NotationToken[] = [];
+  parseRun(text, tokens);
   return tokens;
 }
 

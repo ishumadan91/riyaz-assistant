@@ -19,5 +19,5 @@ type Story = StoryObj;
 export const Checked: Story = { args: { checked: true } };
 export const Unchecked: Story = { args: { checked: false, label: 'Bhairavi' } };
 export const LongLabel: Story = {
-  args: { checked: false, label: 'Reveal the upcoming sequences in the sidebar' },
+  args: { checked: false, label: 'Bhairav' },
 };
