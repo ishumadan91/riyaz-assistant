@@ -123,7 +123,7 @@ export const ALANKARS: readonly Alankar[] = [
     n: 40, group: ALANKAR_GROUPS[6],
     parts: [{
       label: '', lines: [
-        'S .N | RS | GR | mGRS',
+        'S(.N) | RS | GR | mGRS',
         'RS | GR | mG | PmGR',
         'GR | mG | Pm | DPmG',
         'mG | Pm | DP | NDPm',
