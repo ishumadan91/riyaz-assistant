@@ -152,7 +152,7 @@ export const ALANKARS: readonly Alankar[] = [
   av(47, 7, 'SRGm, SR, SR, SRGmPDNS.', 'S.NDP, S.N, S.N, S.NDPmGRS'),
   av(48, 7, 'SRG SRG SR SRGmPDNS.', 'S.ND S.ND S.N S.NDPmGRS'),
   av(49, 7, 'SRGmPmGR SRGmPDNS.', 'S.NDPmPDN S.NDPmGRS'),
-  av(50, 7, 'SRGm Pm DP, SRGmPDNS.', 'S.NDP DP Gm, S.NDPmGRS'),
+  av(50, 7, 'SRGm Pm DP, SRGmPDNS.', 'S.NDP mP Gm, S.NDPmGRS'),
   {
     n: 51, group: ALANKAR_GROUPS[7],
     parts: [{ label: '', lines: ['SR-S, SRG-R, SRGm-G, SRGmP-m, SRGmPD-P, SRGmPDN-D, SRGmPDNS.-N, SRGmPDNS.-S.NDPmGRS'] }]
